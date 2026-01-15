@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { getPostBySlug, getAllPosts } from '@/data/blog';
 import BlogDetailClient from '@/components/blog/BlogDetailClient';
-import { locales } from '@/i18n/routing';
+import { locales, Locale } from '@/i18n/routing';
 import { getNavItems } from '@/config/navigation';
 
 // 生成静态参数 - 为每个语言和每篇文章生成
@@ -24,13 +24,13 @@ export function generateStaticParams() {
 
 interface BlogDetailPageProps {
   params: Promise<{
-    locale: string;
+    locale: Locale;
     slug: string;
   }>;
 }
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = getPostBySlug(slug);
   
   if (!post) {
@@ -48,6 +48,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       readTimeText={t('readTime')}
       backText={t('backToList')}
       navItems={navItems}
+      locale={locale}
     />
   );
 }

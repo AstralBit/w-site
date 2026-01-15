@@ -39,11 +39,6 @@ const float = keyframes`
   75% { transform: translateY(3px) rotate(-2deg); }
 `;
 
-const typewriter = keyframes`
-  from { width: 0; }
-  to { width: 100%; }
-`;
-
 const cursorBlink = keyframes`
   0%, 100% { border-color: #00ff41; }
   50% { border-color: transparent; }
@@ -235,7 +230,7 @@ const Nav = styled.nav`
 
 const NavButton = styled.button<{ $active?: boolean }>`
   font-family: ${pixelFont};
-  font-size: 0.55rem;
+  font-size: 0.8rem;
   color: ${props => props.$active ? '#0a0a0a' : 'var(--text-secondary)'};
   background: ${props => props.$active ? '#00ff41' : 'transparent'};
   border: 2px solid ${props => props.$active ? '#00ff41' : 'var(--card-border)'};
@@ -245,6 +240,7 @@ const NavButton = styled.button<{ $active?: boolean }>`
   transition: all 0.1s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
+  font-weight: bold;
 
   /* 像素角 */
   clip-path: polygon(
