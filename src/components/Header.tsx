@@ -4,7 +4,6 @@ import styled, { keyframes } from "styled-components";
 import { Link } from "../i18n/routing";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
-import GooeyNav from "./GooeyNav";
 
 // 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
@@ -214,15 +213,13 @@ export default function Header({
             <PixelDot $color="#00ff00" $delay={0.6} />
           </PixelIndicator>
 
-          {/* <NavLinks>
+          <NavLinks>
             {navItems.map((item) => (
               <NavLink key={item.href} href={item.href}>
                 {item.label}
               </NavLink>
             ))}
-          </NavLinks> */}
-
-          <GooeyNav timeVariance={1000} items={navItems} />
+          </NavLinks>
 
           <PixelDivider />
 
