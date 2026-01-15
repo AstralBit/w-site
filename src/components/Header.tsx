@@ -1,8 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { Link } from '../i18n/routing';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const HeaderWrapper = styled.header`
@@ -101,18 +100,16 @@ export default function Header({
   logoText = 'W-Site',
   navItems = []
 }: HeaderProps) {
-  const locale = useLocale();
-  
   return (
     <HeaderWrapper>
       <HeaderInner>
-        <Logo href={`/${locale}`}>
+        <Logo href="/">
           {logoText}
         </Logo>
         <Nav>
           <NavLinks>
             {navItems.map((item) => (
-              <NavLink key={item.href} href={`/${locale}${item.href}`}>
+              <NavLink key={item.href} href={item.href}>
                 {item.label}
               </NavLink>
             ))}

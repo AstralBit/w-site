@@ -1,8 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { Link } from '../../i18n/routing';
 import { BlogPost } from '@/types/blog';
 import Header from '../Header';
 
@@ -308,13 +307,11 @@ export default function BlogDetailClient({
   backText,
   navItems 
 }: BlogDetailClientProps) {
-  const locale = useLocale();
-  
   return (
     <PageWrapper>
       <Header navItems={navItems} />
       <Container>
-        <BackLink href={`/${locale}/blog`}>
+        <BackLink href="/blog">
           {backText}
         </BackLink>
         
@@ -341,7 +338,14 @@ export default function BlogDetailClient({
           <ReadTime>{post.readingTime} {readTimeText}</ReadTime>
         </Meta>
         
-        <Content dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br/>') }} />
+        <Content>
+          {post.content.split('\n').map((line, index) => (
+            <span key={index}>
+              {line}
+              <br />
+            </span>
+          ))}
+        </Content>
         
         <Tags>
           {post.tags.map(tag => (

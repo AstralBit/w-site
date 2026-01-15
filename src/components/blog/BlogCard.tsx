@@ -1,8 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { Link } from '../../i18n/routing';
 import { BlogPost } from '@/types/blog';
 
 const Card = styled.article`
@@ -179,11 +178,9 @@ interface BlogCardProps {
 }
 
 export default function BlogCard({ post, readTimeText = '分钟阅读' }: BlogCardProps) {
-  const locale = useLocale();
-  
   return (
     <Card>
-      <CardLink href={`/${locale}/blog/${post.slug}`}>
+      <CardLink href={`/blog/${post.slug}`}>
         <CoverImage $bgColor={getCoverColor(post.category)}>
           {getCategoryIcon(post.category)}
         </CoverImage>
