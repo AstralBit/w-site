@@ -4,7 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import { BlogPost } from '@/types/blog';
 import BlogList from './BlogList';
 import Header from '../Header';
-import CyberBackground from '../CyberBackground';
+import StarWarsBackground from '../StarWarsBackground';
 import { Locale } from '@/i18n/routing';
 import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
 
@@ -52,11 +52,6 @@ const pulse = keyframes`
     transform: scale(1.02);
     box-shadow: 0 0 20px 5px rgba(0, 255, 65, 0.2);
   }
-`;
-
-const typewriter = keyframes`
-  from { width: 0; }
-  to { width: 100%; }
 `;
 
 const neonFlicker = keyframes`
@@ -367,8 +362,8 @@ export default function BlogPageClient({
 }: BlogPageClientProps) {
   return (
     <PageWrapper>
-      {/* 赛博朋克背景 */}
-      <CyberBackground />
+      {/* 星际大战背景 */}
+      <StarWarsBackground />
       
       {/* 浮动装饰 */}
       <FloatingDecor $top="15%" $left="3%" $delay={0} $size="4rem">📚</FloatingDecor>

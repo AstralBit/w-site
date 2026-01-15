@@ -4,7 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import { Link } from '../../i18n/routing';
 import { BlogPost } from '@/types/blog';
 import Header from '../Header';
-import CyberBackground from '../CyberBackground';
+import StarWarsBackground from '../StarWarsBackground';
 import { Locale } from '@/i18n/routing';
 import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
 
@@ -654,8 +654,8 @@ export default function BlogDetailClient({
 }: BlogDetailClientProps) {
   return (
     <PageWrapper>
-      {/* 赛博朋克背景 */}
-      <CyberBackground />
+      {/* 星际大战背景 */}
+      <StarWarsBackground />
       
       <Header navItems={navItems} />
       
