@@ -7,11 +7,8 @@ import Header from '../Header';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: #fafafa;
-  
-  @media (prefers-color-scheme: dark) {
-    background: #0a0a0a;
-  }
+  background: var(--page-bg);
+  transition: background-color 0.3s ease;
 `;
 
 const Container = styled.main`
@@ -24,22 +21,14 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #525252;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.875rem;
   margin-bottom: 32px;
   transition: color 0.2s ease;
   
-  @media (prefers-color-scheme: dark) {
-    color: #a1a1aa;
-  }
-  
   &:hover {
-    color: #171717;
-    
-    @media (prefers-color-scheme: dark) {
-      color: #ededed;
-    }
+    color: var(--foreground);
   }
   
   &::before {
@@ -74,14 +63,11 @@ const Category = styled.span`
 const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 800;
-  color: #171717;
+  color: var(--foreground);
   margin: 24px 0;
   line-height: 1.3;
   letter-spacing: -0.02em;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #ededed;
-  }
+  transition: color 0.3s ease;
   
   @media (max-width: 640px) {
     font-size: 1.75rem;
@@ -94,11 +80,8 @@ const Meta = styled.div`
   gap: 24px;
   margin-bottom: 48px;
   padding-bottom: 32px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  
-  @media (prefers-color-scheme: dark) {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-  }
+  border-bottom: 1px solid var(--card-border);
+  transition: border-color 0.3s ease;
   
   @media (max-width: 640px) {
     flex-direction: column;
@@ -135,49 +118,34 @@ const AuthorInfo = styled.div`
 const AuthorName = styled.span`
   font-size: 1rem;
   font-weight: 600;
-  color: #171717;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #ededed;
-  }
+  color: var(--foreground);
+  transition: color 0.3s ease;
 `;
 
 const PublishDate = styled.span`
   font-size: 0.875rem;
-  color: #737373;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #71717a;
-  }
+  color: var(--text-muted);
+  transition: color 0.3s ease;
 `;
 
 const ReadTime = styled.span`
   font-size: 0.875rem;
-  color: #737373;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #71717a;
-  }
+  color: var(--text-muted);
+  transition: color 0.3s ease;
 `;
 
 const Content = styled.article`
   font-size: 1.125rem;
   line-height: 1.8;
-  color: #374151;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #d1d5db;
-  }
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
   
   h1, h2, h3, h4, h5, h6 {
-    color: #171717;
+    color: var(--foreground);
     margin: 2em 0 1em;
     font-weight: 700;
     line-height: 1.3;
-    
-    @media (prefers-color-scheme: dark) {
-      color: #ededed;
-    }
+    transition: color 0.3s ease;
   }
   
   h1 { font-size: 2rem; }
@@ -198,15 +166,11 @@ const Content = styled.article`
   }
   
   code {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--card-border);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Fira Code', monospace;
     font-size: 0.9em;
-    
-    @media (prefers-color-scheme: dark) {
-      background: rgba(255, 255, 255, 0.1);
-    }
   }
   
   pre {
@@ -228,11 +192,7 @@ const Content = styled.article`
     padding-left: 20px;
     margin: 2em 0;
     font-style: italic;
-    color: #525252;
-    
-    @media (prefers-color-scheme: dark) {
-      color: #a1a1aa;
-    }
+    color: var(--text-secondary);
   }
   
   a {
@@ -251,11 +211,8 @@ const Tags = styled.div`
   gap: 8px;
   margin-top: 48px;
   padding-top: 32px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  
-  @media (prefers-color-scheme: dark) {
-    border-top-color: rgba(255, 255, 255, 0.1);
-  }
+  border-top: 1px solid var(--card-border);
+  transition: border-color 0.3s ease;
 `;
 
 const Tag = styled.span`

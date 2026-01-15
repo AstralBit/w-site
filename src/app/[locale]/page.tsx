@@ -1,11 +1,9 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import Header from "@/components/Header";
-import Antigravity from "@/components/Antigravity";
+import PixelHome from "@/components/PixelHome";
 
 export default async function Home() {
-  const t = await getTranslations("common");
   const headerT = await getTranslations("header");
+  const homeT = await getTranslations("home");
   
   const navItems = [
     { label: headerT("home"), href: "/" },
@@ -14,80 +12,47 @@ export default async function Home() {
     { label: headerT("contact"), href: "/contact" },
   ];
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <Header navItems={navItems} />
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start pt-24">
-        <div style={{ width: "100%", height: "400px", position: "relative" }}>
-          <Antigravity
-            count={300}
-            magnetRadius={6}
-            ringRadius={7}
-            waveSpeed={0.4}
-            waveAmplitude={1}
-            particleSize={1.5}
-            lerpSpeed={0.05}
-            color={"#FF9FFC"}
-            autoAnimate={true}
-            particleVariance={1}
-          />
-        </div>
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            {t("getStarted")}
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            {t("lookingFor")}{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              {t("templates")}
-            </a>{" "}
-            {t("or")}{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              {t("learning")}
-            </a>{" "}
-            {t("center")}
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            {t("deployNow")}
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("documentation")}
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+  // 构建翻译对象传递给客户端组件
+  const translations = {
+    title: homeT("title"),
+    subtitle: homeT("subtitle"),
+    stats: {
+      projects: homeT("stats.projects"),
+      coffee: homeT("stats.coffee"),
+      commits: homeT("stats.commits"),
+    },
+    features: {
+      title: homeT("features.title"),
+      items: [
+        {
+          icon: homeT("features.items.0.icon"),
+          title: homeT("features.items.0.title"),
+          desc: homeT("features.items.0.desc"),
+        },
+        {
+          icon: homeT("features.items.1.icon"),
+          title: homeT("features.items.1.title"),
+          desc: homeT("features.items.1.desc"),
+        },
+        {
+          icon: homeT("features.items.2.icon"),
+          title: homeT("features.items.2.title"),
+          desc: homeT("features.items.2.desc"),
+        },
+        {
+          icon: homeT("features.items.3.icon"),
+          title: homeT("features.items.3.title"),
+          desc: homeT("features.items.3.desc"),
+        },
+      ],
+    },
+    cta: {
+      title: homeT("cta.title"),
+      blog: homeT("cta.blog"),
+      contact: homeT("cta.contact"),
+    },
+    footer: homeT("footer"),
+  };
+
+  return <PixelHome navItems={navItems} translations={translations} />;
 }

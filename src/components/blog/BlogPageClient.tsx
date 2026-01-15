@@ -7,11 +7,8 @@ import Header from '../Header';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: #fafafa;
-  
-  @media (prefers-color-scheme: dark) {
-    background: #0a0a0a;
-  }
+  background: var(--page-bg);
+  transition: background-color 0.3s ease;
 `;
 
 const Container = styled.main`
@@ -28,13 +25,10 @@ const PageHeader = styled.div`
 const Title = styled.h1`
   font-size: 3rem;
   font-weight: 800;
-  color: #171717;
+  color: var(--foreground);
   margin: 0 0 16px;
   letter-spacing: -0.02em;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #ededed;
-  }
+  transition: color 0.3s ease;
   
   @media (max-width: 640px) {
     font-size: 2rem;
@@ -43,14 +37,11 @@ const Title = styled.h1`
 
 const Description = styled.p`
   font-size: 1.125rem;
-  color: #525252;
+  color: var(--text-secondary);
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #a1a1aa;
-  }
+  transition: color 0.3s ease;
 `;
 
 interface BlogPageClientProps {

@@ -5,24 +5,15 @@ import { Link } from '../../i18n/routing';
 import { BlogPost } from '@/types/blog';
 
 const Card = styled.article`
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
-  @media (prefers-color-scheme: dark) {
-    background: #1a1a1a;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-  }
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-    
-    @media (prefers-color-scheme: dark) {
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-    }
   }
 `;
 
@@ -62,27 +53,21 @@ const Title = styled.h3`
   margin: 16px 0 12px;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #171717;
+  color: var(--foreground);
   line-height: 1.4;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #ededed;
-  }
+  transition: color 0.3s ease;
 `;
 
 const Excerpt = styled.p`
   font-size: 0.9rem;
-  color: #525252;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0 0 16px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #a1a1aa;
-  }
+  transition: color 0.3s ease;
 `;
 
 const Meta = styled.div`
@@ -90,11 +75,8 @@ const Meta = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-top: 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  
-  @media (prefers-color-scheme: dark) {
-    border-top-color: rgba(255, 255, 255, 0.1);
-  }
+  border-top: 1px solid var(--card-border);
+  transition: border-color 0.3s ease;
 `;
 
 const Author = styled.div`
@@ -119,20 +101,14 @@ const AuthorAvatar = styled.div<{ $bgColor: string }>`
 const AuthorName = styled.span`
   font-size: 0.875rem;
   font-weight: 500;
-  color: #171717;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #ededed;
-  }
+  color: var(--foreground);
+  transition: color 0.3s ease;
 `;
 
 const ReadTime = styled.span`
   font-size: 0.8rem;
-  color: #737373;
-  
-  @media (prefers-color-scheme: dark) {
-    color: #71717a;
-  }
+  color: var(--text-muted);
+  transition: color 0.3s ease;
 `;
 
 // 根据分类生成颜色

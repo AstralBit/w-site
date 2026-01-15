@@ -23,6 +23,46 @@
     "readTime": "min read",
     "empty": "No posts yet",
     "backToList": "Back to blog"
+  },
+  "home": {
+    "title": "PIXEL DEV",
+    "subtitle": "Full-stack engineer who loves code, focused on creating fun digital experiences",
+    "stats": {
+      "projects": "Projects Done",
+      "coffee": "Coffee Consumed",
+      "commits": "Git Commits"
+    },
+    "features": {
+      "title": "SKILL TREE",
+      "items": [
+        {
+          "icon": "⚛️",
+          "title": "Frontend Dev",
+          "desc": "React / Vue / Next.js for modern UI"
+        },
+        {
+          "icon": "🔧",
+          "title": "Backend Services",
+          "desc": "Node.js / Python / Go for high-perf APIs"
+        },
+        {
+          "icon": "🎨",
+          "title": "UI/UX Design",
+          "desc": "Pixel-perfect beautiful interfaces"
+        },
+        {
+          "icon": "🚀",
+          "title": "DevOps",
+          "desc": "Docker / K8s / CI/CD automation"
+        }
+      ]
+    },
+    "cta": {
+      "title": "READY TO START THE ADVENTURE?",
+      "blog": "Read Blog",
+      "contact": "Contact Me"
+    },
+    "footer": "Built with code and passion"
   }
 }
 
