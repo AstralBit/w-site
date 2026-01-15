@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useEffect, useCallback } from "react";
 import styled, { keyframes } from "styled-components";
-import { Link } from "../i18n/routing";
+import { Link, useRouter } from "../i18n/routing";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 
@@ -115,23 +115,23 @@ const NavLinks = styled.div`
   }
 `;
 
-const NavLink = styled(Link)`
+const NavLinkStyled = styled.button`
   font-family: ${pixelFont};
   color: var(--text-secondary);
   text-decoration: none;
   padding: 8px 12px;
   border: 2px solid transparent;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   position: relative;
   font-size: 1rem;
   font-weight: bold;
+  background: transparent;
+  cursor: pointer;
 
   &:hover {
     color: var(--foreground);
     border-color: var(--foreground);
     background: var(--card-bg);
-
-    /* 像素化阴影 */
     box-shadow: 4px 4px 0 var(--foreground);
     transform: translate(-2px, -2px);
   }
@@ -139,6 +139,11 @@ const NavLink = styled(Link)`
   &:active {
     transform: translate(0, 0);
     box-shadow: none;
+  }
+
+  &[data-loading="true"] {
+    opacity: 0.7;
+    pointer-events: none;
   }
 `;
 
@@ -229,7 +234,7 @@ const MobileNavLinks = styled.div`
 `;
 
 // 移动端导航链接
-const MobileNavLink = styled(Link)`
+const MobileNavLinkStyled = styled.button`
   font-family: ${pixelFont};
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -237,11 +242,14 @@ const MobileNavLink = styled(Link)`
   padding: 12px 16px;
   border: 2px solid var(--foreground);
   background: var(--card-bg);
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
   gap: 8px;
   box-shadow: 4px 4px 0 var(--foreground);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
 
   &::before {
     content: "▶";
@@ -254,6 +262,11 @@ const MobileNavLink = styled(Link)`
     color: #000;
     transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 var(--foreground);
+  }
+
+  &[data-loading="true"] {
+    opacity: 0.7;
+    pointer-events: none;
   }
 `;
 
@@ -343,14 +356,37 @@ export default function Header({
   navItems = [],
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  // 预加载所有导航页面
+  useEffect(() => {
+    navItems.forEach((item) => {
+      router.prefetch(item.href);
+    });
+  }, [navItems, router]);
 
-  const closeMobileMenu = () => {
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
-  };
+  }, []);
+
+  // 使用 startTransition 进行导航，避免阻塞 UI
+  const handleNavClick = useCallback((href: string) => {
+    startTransition(() => {
+      router.push(href);
+    });
+  }, [router]);
+
+  const handleMobileNavClick = useCallback((href: string) => {
+    closeMobileMenu();
+    startTransition(() => {
+      router.push(href);
+    });
+  }, [router, closeMobileMenu]);
 
   return (
     <HeaderWrapper>
@@ -366,9 +402,13 @@ export default function Header({
 
           <NavLinks>
             {navItems.map((item) => (
-              <NavLink key={item.href} href={item.href}>
+              <NavLinkStyled 
+                key={item.href} 
+                onClick={() => handleNavClick(item.href)}
+                data-loading={isPending}
+              >
                 {item.label}
-              </NavLink>
+              </NavLinkStyled>
             ))}
           </NavLinks>
 
@@ -394,13 +434,13 @@ export default function Header({
           <MobileMenuTitle>MENU</MobileMenuTitle>
           <MobileNavLinks>
             {navItems.map((item) => (
-              <MobileNavLink 
+              <MobileNavLinkStyled 
                 key={item.href} 
-                href={item.href}
-                onClick={closeMobileMenu}
+                onClick={() => handleMobileNavClick(item.href)}
+                data-loading={isPending}
               >
                 {item.label}
-              </MobileNavLink>
+              </MobileNavLinkStyled>
             ))}
           </MobileNavLinks>
           <MobileActions>
