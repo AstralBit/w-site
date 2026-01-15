@@ -1,36 +1,75 @@
 "use client";
 
 import { useState, useTransition, useEffect, useCallback } from "react";
-import styled, { keyframes } from "styled-components";
-import { Link, useRouter } from "../i18n/routing";
+import styled, { keyframes, css } from "styled-components";
+import { Link, useRouter, usePathname } from "../i18n/routing";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 
 // 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
 
-// 动画
-const pulse = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-`;
-
-const slideIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+// ========== 动画定义 ==========
+const glitchAnim = keyframes`
+  0%, 100% { 
+    clip-path: inset(0 0 0 0);
+    transform: translate(0);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  5% { 
+    clip-path: inset(40% 0 30% 0);
+    transform: translate(-2px, 2px);
+  }
+  10% { 
+    clip-path: inset(10% 0 60% 0);
+    transform: translate(2px, -1px);
+  }
+  15% { 
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(-1px, 2px);
+  }
+  20% { 
+    clip-path: inset(0 0 0 0);
+    transform: translate(0);
   }
 `;
 
-const blink = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+const float = keyframes`
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(2deg); }
+  75% { transform: translateY(3px) rotate(-2deg); }
 `;
 
+const typewriter = keyframes`
+  from { width: 0; }
+  to { width: 100%; }
+`;
+
+const cursorBlink = keyframes`
+  0%, 100% { border-color: #00ff41; }
+  50% { border-color: transparent; }
+`;
+
+const rainbow = keyframes`
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+`;
+
+const bounce = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+`;
+
+const rotate = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`;
+
+const scanline = keyframes`
+  0% { top: -100%; }
+  100% { top: 100%; }
+`;
+
+// ========== 样式组件 ==========
 const HeaderWrapper = styled.header`
   position: fixed;
   top: 0;
@@ -38,74 +77,153 @@ const HeaderWrapper = styled.header`
   right: 0;
   z-index: 100;
   background: var(--header-bg);
-  border-bottom: 4px solid var(--foreground);
-  transition: background-color 0.3s ease;
+  border-bottom: 3px solid var(--foreground);
+  overflow: hidden;
 
-  /* 像素化扫描线效果 */
+  /* CRT 扫描线效果 */
+  &::before {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%
+    );
+    animation: ${scanline} 4s linear infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* 底部像素装饰条 */
   &::after {
     content: "";
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%);
-    background-size: 100% 4px;
-    pointer-events: none;
+    height: 3px;
+    background: repeating-linear-gradient(
+      90deg,
+      #ff2d7b 0px,
+      #ff2d7b 8px,
+      #00d4ff 8px,
+      #00d4ff 16px,
+      #ffff00 16px,
+      #ffff00 24px,
+      #00ff41 24px,
+      #00ff41 32px
+    );
+    animation: ${rainbow} 8s linear infinite;
   }
 `;
 
 const HeaderInner = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 72px;
+  padding: 0 20px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
 `;
 
-const Logo = styled(Link)`
-  font-family: ${pixelFont};
-  font-size: 1rem;
-  color: var(--foreground);
-  text-decoration: none;
+// Logo 区域 - 终端风格
+const LogoArea = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
+  gap: 12px;
+`;
 
+const TerminalIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  background: #0a0a0a;
+  border: 2px solid #00ff41;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  animation: ${float} 3s ease-in-out infinite;
+  position: relative;
+  
   &::before {
-    content: "◀";
-    color: #00d4ff;
-    animation: ${pulse} 2s ease-in-out infinite;
+    content: ">";
+    color: #00ff41;
+    font-family: ${pixelFont};
+    font-size: 12px;
+    animation: ${cursorBlink} 1s step-end infinite;
   }
+`;
 
+const LogoText = styled(Link)`
+  font-family: ${pixelFont};
+  font-size: 0.8rem;
+  color: #00ff41;
+  text-decoration: none;
+  position: relative;
+  letter-spacing: 2px;
+  
+  /* 打字机效果容器 */
   &::after {
-    content: "▶";
-    color: #ff2d7b;
-    animation: ${pulse} 2s ease-in-out infinite;
-    animation-delay: 1s;
+    content: "_";
+    animation: ${cursorBlink} 0.8s step-end infinite;
+    margin-left: 2px;
   }
 
   &:hover {
-    color: #00d4ff;
-    text-shadow: 2px 2px 0 #ff2d7b;
+    animation: ${glitchAnim} 0.3s ease-in-out;
+    text-shadow: 
+      2px 0 #ff2d7b,
+      -2px 0 #00d4ff;
+  }
+
+  @media (max-width: 640px) {
+    font-size: 0.6rem;
   }
 `;
 
-const Nav = styled.nav`
+// 状态栏 - 游戏风格
+const StatusBar = styled.div`
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--card-border);
+  border-radius: 0;
 
-  @media (max-width: 768px) {
-    gap: 12px;
+  @media (max-width: 900px) {
+    display: none;
   }
 `;
 
-const NavLinks = styled.div`
+const StatusItem = styled.div<{ $color?: string }>`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: ${pixelFont};
+  font-size: 0.5rem;
+  color: ${props => props.$color || 'var(--text-secondary)'};
+`;
+
+const StatusIcon = styled.span<{ $animate?: boolean }>`
+  font-size: 12px;
+  ${props => props.$animate && css`
+    animation: ${bounce} 1s ease-in-out infinite;
+  `}
+`;
+
+const StatusValue = styled.span`
+  color: var(--foreground);
+`;
+
+// 导航区域 - 像素按钮风格
+const Nav = styled.nav`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -115,25 +233,47 @@ const NavLinks = styled.div`
   }
 `;
 
-const NavLinkStyled = styled.button`
+const NavButton = styled.button<{ $active?: boolean }>`
   font-family: ${pixelFont};
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: 8px 12px;
-  border: 2px solid transparent;
-  transition: all 0.15s ease;
-  position: relative;
-  font-size: 1rem;
-  font-weight: bold;
-  background: transparent;
+  font-size: 0.55rem;
+  color: ${props => props.$active ? '#0a0a0a' : 'var(--text-secondary)'};
+  background: ${props => props.$active ? '#00ff41' : 'transparent'};
+  border: 2px solid ${props => props.$active ? '#00ff41' : 'var(--card-border)'};
+  padding: 8px 14px;
   cursor: pointer;
+  position: relative;
+  transition: all 0.1s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
+
+  &::before {
+    content: "${props => props.$active ? '◆' : '◇'}";
+    margin-right: 6px;
+    font-size: 8px;
+    color: ${props => props.$active ? '#0a0a0a' : '#ff2d7b'};
+  }
 
   &:hover {
-    color: var(--foreground);
-    border-color: var(--foreground);
-    background: var(--card-bg);
-    box-shadow: 4px 4px 0 var(--foreground);
+    color: #0a0a0a;
+    background: #00d4ff;
+    border-color: #00d4ff;
     transform: translate(-2px, -2px);
+    box-shadow: 
+      2px 2px 0 var(--foreground),
+      4px 4px 0 #ff2d7b;
+
+    &::before {
+      content: "◆";
+      color: #0a0a0a;
+    }
   }
 
   &:active {
@@ -142,205 +282,223 @@ const NavLinkStyled = styled.button`
   }
 
   &[data-loading="true"] {
-    opacity: 0.7;
+    opacity: 0.6;
     pointer-events: none;
   }
 `;
 
-const Actions = styled.div`
+// 右侧操作区
+const RightArea = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 `;
 
-const PixelDivider = styled.div`
-  width: 4px;
-  height: 24px;
-  background: var(--foreground);
-  margin: 0 8px;
+// 像素分隔符
+const PixelSeparator = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 8px;
+
+  span {
+    width: 4px;
+    height: 4px;
+    background: var(--text-muted);
+  }
 
   @media (max-width: 768px) {
     display: none;
   }
 `;
 
-// 像素风格的移动端菜单按钮
-const MobileMenuButton = styled.button<{ $isOpen?: boolean }>`
+// 装饰性小游戏人物
+const PixelCharacter = styled.div`
+  font-size: 20px;
+  animation: ${float} 2s ease-in-out infinite;
+  cursor: default;
+  user-select: none;
+
+  &:hover {
+    animation: ${rotate} 0.5s linear;
+  }
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+// 移动端菜单按钮
+const MobileMenuBtn = styled.button<{ $isOpen: boolean }>`
   display: none;
   font-family: ${pixelFont};
-  font-size: 1.25rem;
-  background: ${props => props.$isOpen ? '#00d4ff' : 'transparent'};
+  font-size: 10px;
+  background: ${props => props.$isOpen ? '#ff2d7b' : 'transparent'};
   border: 2px solid var(--foreground);
-  color: ${props => props.$isOpen ? '#000' : 'var(--foreground)'};
+  color: ${props => props.$isOpen ? '#fff' : 'var(--foreground)'};
+  padding: 10px;
   cursor: pointer;
-  padding: 8px 12px;
-  transition: all 0.2s ease;
-  box-shadow: ${props => props.$isOpen ? 'none' : '2px 2px 0 var(--foreground)'};
-  transform: ${props => props.$isOpen ? 'translate(2px, 2px)' : 'translate(0, 0)'};
+  position: relative;
+  transition: all 0.15s ease;
+
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
 
   @media (max-width: 768px) {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
   }
 
   &:hover {
-    background: ${props => props.$isOpen ? '#00d4ff' : 'var(--card-bg)'};
-    color: ${props => props.$isOpen ? '#000' : '#00d4ff'};
-  }
-
-  &:active {
-    transform: translate(2px, 2px);
-    box-shadow: none;
+    background: #00d4ff;
+    color: #0a0a0a;
   }
 `;
 
 // 移动端菜单面板
-const MobileMenu = styled.div<{ $isOpen: boolean }>`
+const MobilePanel = styled.div<{ $isOpen: boolean }>`
   display: none;
-  
+
   @media (max-width: 768px) {
-    display: ${props => props.$isOpen ? 'block' : 'none'};
-    position: absolute;
-    top: 100%;
+    display: block;
+    position: fixed;
+    top: 70px;
     left: 0;
     right: 0;
-    background: var(--header-bg);
-    border-top: 4px solid var(--foreground);
-    border-bottom: 4px solid var(--foreground);
-    box-shadow: 0 8px 0 var(--foreground);
-    padding: 16px;
-    animation: ${slideIn} 0.2s ease-out;
-    
-    /* 像素化扫描线效果 */
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.03) 50%);
-      background-size: 100% 4px;
-      pointer-events: none;
-    }
+    bottom: 0;
+    background: var(--background);
+    transform: translateX(${props => props.$isOpen ? '0' : '100%'});
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 99;
+    padding: 24px;
+    overflow-y: auto;
+
+    /* 网格背景 */
+    background-image: 
+      linear-gradient(var(--card-border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 `;
 
-// 移动端导航链接容器
-const MobileNavLinks = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-`;
-
-// 移动端导航链接
-const MobileNavLinkStyled = styled.button`
+const MobileTitle = styled.div`
   font-family: ${pixelFont};
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: 12px 16px;
-  border: 2px solid var(--foreground);
-  background: var(--card-bg);
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 4px 4px 0 var(--foreground);
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
-
-  &::before {
-    content: "▶";
-    color: #00d4ff;
-    font-size: 0.5rem;
-  }
-
-  &:hover, &:active {
-    background: #00d4ff;
-    color: #000;
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 var(--foreground);
-  }
-
-  &[data-loading="true"] {
-    opacity: 0.7;
-    pointer-events: none;
-  }
-`;
-
-// 移动端操作区域
-const MobileActions = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 16px;
-  border-top: 2px dashed var(--card-border);
-`;
-
-// 移动端菜单标题
-const MobileMenuTitle = styled.div`
-  font-family: ${pixelFont};
-  font-size: 0.5rem;
-  color: var(--text-muted);
-  margin-bottom: 12px;
+  font-size: 0.7rem;
+  color: #00ff41;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
   gap: 8px;
 
   &::before {
-    content: "◆";
+    content: "//";
     color: #ff2d7b;
   }
 
   &::after {
     content: "_";
-    animation: ${blink} 1s step-end infinite;
+    animation: ${cursorBlink} 0.8s step-end infinite;
   }
 `;
 
-// 遮罩层
-const Overlay = styled.div<{ $isOpen: boolean }>`
-  display: none;
-  
-  @media (max-width: 768px) {
-    display: ${props => props.$isOpen ? 'block' : 'none'};
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-  }
-`;
-
-// 装饰性像素点
-const PixelDot = styled.span<{ $color?: string; $delay?: number }>`
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: ${(props) => props.$color || "#00d4ff"};
-  animation: ${pulse} 2s ease-in-out infinite;
-  animation-delay: ${(props) => props.$delay || 0}s;
-
-  @media (max-width: 640px) {
-    width: 6px;
-    height: 6px;
-  }
-`;
-
-const PixelIndicator = styled.div`
+const MobileNavList = styled.div`
   display: flex;
-  gap: 4px;
-  margin-right: 16px;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+`;
 
-  @media (max-width: 768px) {
-    display: none;
+const MobileNavItem = styled.button<{ $index: number }>`
+  font-family: ${pixelFont};
+  font-size: 0.65rem;
+  color: var(--foreground);
+  background: var(--card-bg);
+  border: 3px solid var(--foreground);
+  padding: 16px 20px;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  transition: all 0.15s ease;
+  animation: slideInRight 0.3s ease-out;
+  animation-delay: ${props => props.$index * 0.1}s;
+  animation-fill-mode: both;
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  &::before {
+    content: "0${props => props.$index + 1}";
+    font-size: 0.5rem;
+    color: #ff2d7b;
+    margin-right: 12px;
+  }
+
+  &::after {
+    content: "→";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00d4ff;
+    opacity: 0;
+    transition: all 0.15s ease;
+  }
+
+  &:hover {
+    background: #00ff41;
+    color: #0a0a0a;
+    transform: translateX(8px);
+    box-shadow: -8px 0 0 #ff2d7b;
+
+    &::before {
+      color: #0a0a0a;
+    }
+
+    &::after {
+      opacity: 1;
+      right: 12px;
+    }
   }
 `;
 
+const MobileActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 2px dashed var(--card-border);
+`;
+
+const MobileFooter = styled.div`
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  font-family: ${pixelFont};
+  font-size: 0.4rem;
+  color: var(--text-muted);
+  text-align: center;
+
+  span {
+    color: #ff2d7b;
+  }
+`;
+
+// ========== 组件 ==========
 interface NavItem {
   label: string;
   href: string;
@@ -352,29 +510,53 @@ interface HeaderProps {
 }
 
 export default function Header({
-  logoText = "PIXEL",
+  logoText = "PIXEL.DEV",
   navItems = [],
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [time, setTime] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
 
-  // 预加载所有导航页面
+  // 实时时间
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setTime(now.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }));
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // 预加载
   useEffect(() => {
     navItems.forEach((item) => {
       router.prefetch(item.href);
     });
   }, [navItems, router]);
 
+  // 禁止滚动
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(prev => !prev);
   }, []);
 
-  const closeMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(false);
-  }, []);
-
-  // 使用 startTransition 进行导航，避免阻塞 UI
   const handleNavClick = useCallback((href: string) => {
     startTransition(() => {
       router.push(href);
@@ -382,76 +564,107 @@ export default function Header({
   }, [router]);
 
   const handleMobileNavClick = useCallback((href: string) => {
-    closeMobileMenu();
+    setIsMobileMenuOpen(false);
     startTransition(() => {
       router.push(href);
     });
-  }, [router, closeMobileMenu]);
+  }, [router]);
+
+  // 检查是否是当前路由
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
 
   return (
-    <HeaderWrapper>
-      <HeaderInner>
-        <Logo href="/">{logoText}</Logo>
+    <>
+      <HeaderWrapper>
+        <HeaderInner>
+          {/* Logo 区域 */}
+          <LogoArea>
+            <TerminalIcon />
+            <LogoText href="/">{logoText}</LogoText>
+          </LogoArea>
 
-        <Nav>
-          <PixelIndicator>
-            <PixelDot $color="#ff2d7b" $delay={0} />
-            <PixelDot $color="#ffff00" $delay={0.3} />
-            <PixelDot $color="#00ff00" $delay={0.6} />
-          </PixelIndicator>
+          {/* 状态栏 */}
+          <StatusBar>
+            <StatusItem $color="#00ff41">
+              <StatusIcon $animate>⚡</StatusIcon>
+              <StatusValue>ONLINE</StatusValue>
+            </StatusItem>
+            <StatusItem>
+              <StatusIcon>🕐</StatusIcon>
+              <StatusValue>{time}</StatusValue>
+            </StatusItem>
+            <StatusItem $color="#ffff00">
+              <StatusIcon>★</StatusIcon>
+              <StatusValue>LV.99</StatusValue>
+            </StatusItem>
+          </StatusBar>
 
-          <NavLinks>
+          {/* 导航 */}
+          <Nav>
             {navItems.map((item) => (
-              <NavLinkStyled 
-                key={item.href} 
+              <NavButton
+                key={item.href}
+                $active={isActive(item.href)}
                 onClick={() => handleNavClick(item.href)}
                 data-loading={isPending}
               >
                 {item.label}
-              </NavLinkStyled>
+              </NavButton>
             ))}
-          </NavLinks>
+          </Nav>
 
-          <PixelDivider />
+          {/* 右侧区域 */}
+          <RightArea>
+            <PixelCharacter title="Hello!">🎮</PixelCharacter>
+            
+            <PixelSeparator>
+              <span />
+              <span />
+              <span />
+            </PixelSeparator>
 
-          <Actions>
             <ThemeSwitcher />
             <LanguageSwitcher />
-          </Actions>
 
-          <MobileMenuButton 
-            $isOpen={isMobileMenuOpen}
-            onClick={toggleMobileMenu}
-            aria-label="菜单"
-            aria-expanded={isMobileMenuOpen}
-          >
-            {isMobileMenuOpen ? '✕' : '☰'}
-          </MobileMenuButton>
-        </Nav>
+            <MobileMenuBtn 
+              $isOpen={isMobileMenuOpen} 
+              onClick={toggleMobileMenu}
+              aria-label="Menu"
+            >
+              {isMobileMenuOpen ? '✕ CLOSE' : '☰ MENU'}
+            </MobileMenuBtn>
+          </RightArea>
+        </HeaderInner>
+      </HeaderWrapper>
 
-        {/* 移动端菜单 */}
-        <MobileMenu $isOpen={isMobileMenuOpen}>
-          <MobileMenuTitle>MENU</MobileMenuTitle>
-          <MobileNavLinks>
-            {navItems.map((item) => (
-              <MobileNavLinkStyled 
-                key={item.href} 
-                onClick={() => handleMobileNavClick(item.href)}
-                data-loading={isPending}
-              >
-                {item.label}
-              </MobileNavLinkStyled>
-            ))}
-          </MobileNavLinks>
-          <MobileActions>
-            <ThemeSwitcher />
-            <LanguageSwitcher />
-          </MobileActions>
-        </MobileMenu>
+      {/* 移动端面板 */}
+      <MobilePanel $isOpen={isMobileMenuOpen}>
+        <MobileTitle>SELECT DESTINATION</MobileTitle>
         
-        {/* 遮罩层 */}
-        <Overlay $isOpen={isMobileMenuOpen} onClick={closeMobileMenu} />
-      </HeaderInner>
-    </HeaderWrapper>
+        <MobileNavList>
+          {navItems.map((item, index) => (
+            <MobileNavItem
+              key={item.href}
+              $index={index}
+              onClick={() => handleMobileNavClick(item.href)}
+            >
+              {item.label}
+            </MobileNavItem>
+          ))}
+        </MobileNavList>
+
+        <MobileActions>
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </MobileActions>
+
+        <MobileFooter>
+          PRESS <span>START</span> TO BEGIN YOUR JOURNEY
+        </MobileFooter>
+      </MobilePanel>
+    </>
   );
 }

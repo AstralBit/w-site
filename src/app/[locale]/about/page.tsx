@@ -57,7 +57,6 @@ export default async function AboutPage() {
       title: aboutT("contact.title"),
       email: aboutT("contact.email"),
       github: aboutT("contact.github"),
-      twitter: aboutT("contact.twitter"),
     },
     cta: {
       title: aboutT("cta.title"),

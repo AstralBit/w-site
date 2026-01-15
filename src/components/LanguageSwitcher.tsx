@@ -3,46 +3,79 @@
 import { useLocale } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { locales, type Locale } from '../i18n/routing';
 
-// 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
+
+const bounce = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+`;
 
 const SwitcherWrapper = styled.div`
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 0;
+  border: 2px solid var(--foreground);
+  background: var(--card-bg);
+  position: relative;
+  overflow: hidden;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
 `;
 
 const LanguageButton = styled(Link)<{ $active: boolean }>`
   font-family: ${pixelFont};
-  font-size: 0.5rem;
-  padding: 6px 10px;
-  border: 2px solid var(--foreground);
-  background: ${props => props.$active ? '#00d4ff' : 'var(--card-bg)'};
-  color: ${props => props.$active ? '#000' : 'var(--foreground)'};
+  font-size: 0.45rem;
+  padding: 8px 10px;
+  background: ${props => props.$active ? '#ff2d7b' : 'transparent'};
+  color: ${props => props.$active ? '#fff' : 'var(--text-secondary)'};
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.1s ease;
-  
-  /* 像素化阴影 */
-  box-shadow: ${props => props.$active ? 'none' : '2px 2px 0 var(--foreground)'};
-  transform: ${props => props.$active ? 'translate(2px, 2px)' : 'translate(0, 0)'};
-  
-  &:hover {
-    background: ${props => props.$active ? '#00d4ff' : 'var(--foreground)'};
-    color: ${props => props.$active ? '#000' : 'var(--background)'};
+  transition: all 0.15s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: "${props => props.$active ? '●' : '○'}";
+    font-size: 6px;
+    color: ${props => props.$active ? '#fff' : 'var(--text-muted)'};
   }
+
+  &:hover {
+    background: ${props => props.$active ? '#ff2d7b' : 'rgba(255, 45, 123, 0.2)'};
+    color: ${props => props.$active ? '#fff' : '#ff2d7b'};
+
+    &::before {
+      animation: ${bounce} 0.3s ease-in-out;
+    }
+  }
+
+  &:not(:last-child) {
+    border-right: 1px solid var(--card-border);
+  }
+`;
+
+const Flag = styled.span`
+  font-size: 12px;
+  line-height: 1;
 `;
 
 export default function LanguageSwitcher() {
   const locale = useLocale() as Locale;
   const pathname = usePathname();
 
-  // 获取不带语言前缀的路径
   const getPathWithoutLocale = () => {
     const segments = pathname.split('/');
-    // 如果第一个非空段是语言代码，移除它
     if (segments[1] && locales.includes(segments[1] as Locale)) {
       segments.splice(1, 1);
     }
@@ -50,6 +83,14 @@ export default function LanguageSwitcher() {
   };
 
   const pathWithoutLocale = getPathWithoutLocale();
+
+  const getFlag = (loc: Locale) => {
+    return loc === 'zh' ? '🇨🇳' : '🇺🇸';
+  };
+
+  const getLabel = (loc: Locale) => {
+    return loc === 'zh' ? '中' : 'EN';
+  };
 
   return (
     <SwitcherWrapper>
@@ -59,7 +100,8 @@ export default function LanguageSwitcher() {
           href={`/${loc}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`}
           $active={locale === loc}
         >
-          {loc === 'zh' ? '中文' : 'EN'}
+          <Flag>{getFlag(loc)}</Flag>
+          {getLabel(loc)}
         </LanguageButton>
       ))}
     </SwitcherWrapper>

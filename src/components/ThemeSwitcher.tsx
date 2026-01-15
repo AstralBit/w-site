@@ -3,70 +3,68 @@
 import { useState, useEffect, useLayoutEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 
-// 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
 
-// 动画
-const rotate = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+const glow = keyframes`
+  0%, 100% { box-shadow: 0 0 5px currentColor; }
+  50% { box-shadow: 0 0 15px currentColor, 0 0 25px currentColor; }
 `;
 
-const pulse = keyframes`
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 `;
 
 const SwitcherButton = styled.button<{ $isDark: boolean }>`
-  width: 36px;
-  height: 36px;
-  border: 2px solid var(--foreground);
-  background: var(--card-bg);
-  color: ${props => props.$isDark ? '#fbbf24' : '#525252'};
+  font-family: ${pixelFont};
+  font-size: 0.5rem;
+  padding: 8px 12px;
+  border: 2px solid ${props => props.$isDark ? '#fbbf24' : '#a78bfa'};
+  background: transparent;
+  color: ${props => props.$isDark ? '#fbbf24' : '#a78bfa'};
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  transition: all 0.1s ease;
+  gap: 6px;
+  transition: all 0.15s ease;
   position: relative;
-  
-  /* 像素化阴影 */
-  box-shadow: 2px 2px 0 var(--foreground);
-  
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
+
   &:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0 var(--foreground);
-    
-    span {
-      animation: ${props => props.$isDark ? rotate : pulse} 0.5s ease-in-out;
+    background: ${props => props.$isDark ? '#fbbf24' : '#a78bfa'};
+    color: #0a0a0a;
+    animation: ${glow} 1s ease-in-out infinite;
+
+    .icon {
+      animation: ${spin} 0.5s ease-out;
     }
   }
-  
+
   &:active {
-    transform: translate(2px, 2px);
-    box-shadow: none;
+    transform: scale(0.95);
   }
-  
-  span {
+
+  .icon {
+    font-size: 14px;
     display: inline-block;
   }
+
+  @media (max-width: 640px) {
+    padding: 8px;
+    
+    .label {
+      display: none;
+    }
+  }
 `;
 
-// 像素化图标
-const SunIcon = styled.span`
-  font-family: ${pixelFont};
-  font-size: 0.75rem;
-  color: #fbbf24;
-`;
-
-const MoonIcon = styled.span`
-  font-family: ${pixelFont};
-  font-size: 0.75rem;
-  color: #a78bfa;
-`;
-
-// 在服务端使用 useEffect，在客户端使用 useLayoutEffect
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export default function ThemeSwitcher() {
@@ -74,7 +72,6 @@ export default function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
-    // 检查本地存储或系统偏好
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       setIsDark(savedTheme === 'dark');
@@ -95,18 +92,19 @@ export default function ThemeSwitcher() {
     document.documentElement.setAttribute('data-theme', themeValue);
   };
 
-  // 避免服务端渲染不匹配
   if (!mounted) {
     return (
       <SwitcherButton $isDark={false}>
-        <MoonIcon>🌙</MoonIcon>
+        <span className="icon">🌙</span>
+        <span className="label">DARK</span>
       </SwitcherButton>
     );
   }
 
   return (
-    <SwitcherButton $isDark={isDark} onClick={toggleTheme} aria-label="切换主题">
-      <span>{isDark ? '☀️' : '🌙'}</span>
+    <SwitcherButton $isDark={isDark} onClick={toggleTheme} aria-label="Toggle theme">
+      <span className="icon">{isDark ? '☀️' : '🌙'}</span>
+      <span className="label">{isDark ? 'LIGHT' : 'DARK'}</span>
     </SwitcherButton>
   );
 }

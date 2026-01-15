@@ -435,7 +435,6 @@ interface PixelAboutProps {
       title: string;
       email: string;
       github: string;
-      twitter: string;
     };
     cta: {
       title: string;
