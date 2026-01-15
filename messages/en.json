@@ -44,16 +44,6 @@
           "icon": "🔧",
           "title": "Backend Services",
           "desc": "Node.js / Python / Go for high-perf APIs"
-        },
-        {
-          "icon": "🎨",
-          "title": "UI/UX Design",
-          "desc": "Pixel-perfect beautiful interfaces"
-        },
-        {
-          "icon": "🚀",
-          "title": "DevOps",
-          "desc": "Docker / K8s / CI/CD automation"
         }
       ]
     },

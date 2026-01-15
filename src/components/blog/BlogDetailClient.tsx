@@ -1,76 +1,171 @@
 'use client';
 
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Link } from '../../i18n/routing';
 import { BlogPost } from '@/types/blog';
 import Header from '../Header';
 
+// 像素字体
+const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
+
+// 动画
+const float = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+`;
+
+const blink = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+`;
+
+const scanline = keyframes`
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+`;
+
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: var(--page-bg);
-  transition: background-color 0.3s ease;
+  background: var(--background);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.03) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 10;
+  }
+`;
+
+const Scanline = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  animation: ${scanline} 8s linear infinite;
+  pointer-events: none;
+  z-index: 11;
+`;
+
+const PixelGrid = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(var(--card-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
+  pointer-events: none;
 `;
 
 const Container = styled.main`
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 120px 24px 64px;
+  position: relative;
+  z-index: 1;
 `;
 
 const BackLink = styled(Link)`
+  font-family: ${pixelFont};
   display: inline-flex;
   align-items: center;
   gap: 8px;
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.625rem;
   margin-bottom: 32px;
-  transition: color 0.2s ease;
+  padding: 8px 16px;
+  border: 2px solid var(--foreground);
+  background: var(--card-bg);
+  box-shadow: 4px 4px 0 var(--foreground);
+  transition: all 0.1s ease;
   
   &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--foreground);
     color: var(--foreground);
   }
   
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--foreground);
+  }
+  
   &::before {
-    content: '←';
+    content: '◀';
+    color: #00d4ff;
   }
 `;
 
 const CoverImage = styled.div<{ $bgColor: string }>`
   width: 100%;
-  height: 300px;
+  height: 280px;
   background: ${props => props.$bgColor};
-  border-radius: 16px;
+  border: 4px solid var(--foreground);
+  box-shadow: 8px 8px 0 var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 5rem;
   margin-bottom: 32px;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
 `;
 
-const Category = styled.span`
+const IconWrapper = styled.span`
+  animation: ${float} 3s ease-in-out infinite;
   display: inline-block;
-  padding: 6px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  font-size: 0.8rem;
+`;
+
+const Category = styled.span<{ $color: string }>`
+  font-family: ${pixelFont};
+  display: inline-block;
+  padding: 6px 12px;
+  background: ${props => props.$color};
+  color: #000;
+  font-size: 0.625rem;
   font-weight: 600;
-  border-radius: 20px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  border: 2px solid var(--foreground);
+  box-shadow: 4px 4px 0 var(--foreground);
 `;
 
 const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-family: ${pixelFont};
+  font-size: 1.5rem;
   color: var(--foreground);
   margin: 24px 0;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-  transition: color 0.3s ease;
+  line-height: 1.8;
+  text-shadow: 
+    3px 3px 0 #ff2d7b,
+    -1px -1px 0 #00d4ff;
   
   @media (max-width: 640px) {
-    font-size: 1.75rem;
+    font-size: 1rem;
   }
 `;
 
@@ -79,9 +174,10 @@ const Meta = styled.div`
   align-items: center;
   gap: 24px;
   margin-bottom: 48px;
-  padding-bottom: 32px;
-  border-bottom: 1px solid var(--card-border);
-  transition: border-color 0.3s ease;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 4px solid var(--foreground);
+  box-shadow: 6px 6px 0 var(--foreground);
   
   @media (max-width: 640px) {
     flex-direction: column;
@@ -99,8 +195,8 @@ const Author = styled.div`
 const AuthorAvatar = styled.div<{ $bgColor: string }>`
   width: 48px;
   height: 48px;
-  border-radius: 50%;
   background: ${props => props.$bgColor};
+  border: 3px solid var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,41 +212,53 @@ const AuthorInfo = styled.div`
 `;
 
 const AuthorName = styled.span`
-  font-size: 1rem;
+  font-family: ${pixelFont};
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--foreground);
-  transition: color 0.3s ease;
 `;
 
 const PublishDate = styled.span`
-  font-size: 0.875rem;
+  font-family: ${pixelFont};
+  font-size: 0.5rem;
   color: var(--text-muted);
-  transition: color 0.3s ease;
 `;
 
 const ReadTime = styled.span`
-  font-size: 0.875rem;
+  font-family: ${pixelFont};
+  font-size: 0.625rem;
   color: var(--text-muted);
-  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &::before {
+    content: '⏱️';
+    font-size: 1rem;
+  }
 `;
 
 const Content = styled.article`
-  font-size: 1.125rem;
-  line-height: 1.8;
+  font-family: ${pixelFont};
+  font-size: 0.75rem;
+  line-height: 2.5;
   color: var(--text-secondary);
-  transition: color 0.3s ease;
+  background: var(--card-bg);
+  border: 4px solid var(--foreground);
+  box-shadow: 8px 8px 0 var(--foreground);
+  padding: 32px;
   
   h1, h2, h3, h4, h5, h6 {
     color: var(--foreground);
     margin: 2em 0 1em;
     font-weight: 700;
-    line-height: 1.3;
-    transition: color 0.3s ease;
+    line-height: 1.8;
+    text-shadow: 2px 2px 0 #ff2d7b;
   }
   
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.5rem; }
-  h3 { font-size: 1.25rem; }
+  h1 { font-size: 1.25rem; }
+  h2 { font-size: 1rem; }
+  h3 { font-size: 0.875rem; }
   
   p {
     margin: 1.5em 0;
@@ -162,45 +270,58 @@ const Content = styled.article`
   }
   
   li {
-    margin: 0.5em 0;
+    margin: 0.75em 0;
+    
+    &::marker {
+      color: #00d4ff;
+    }
   }
   
   code {
-    background: var(--card-border);
+    background: var(--foreground);
+    color: var(--background);
     padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.9em;
+    font-family: ${pixelFont};
+    font-size: 0.625rem;
   }
   
   pre {
-    background: #1e1e1e;
+    background: #0a0a0a;
     padding: 20px;
-    border-radius: 12px;
+    border: 4px solid var(--foreground);
+    box-shadow: 4px 4px 0 var(--foreground);
     overflow-x: auto;
     margin: 2em 0;
     
     code {
       background: none;
       padding: 0;
-      color: #d4d4d4;
+      color: #00d4ff;
     }
   }
   
   blockquote {
-    border-left: 4px solid #667eea;
-    padding-left: 20px;
+    border-left: 4px solid #00d4ff;
+    padding: 16px 20px;
     margin: 2em 0;
-    font-style: italic;
-    color: var(--text-secondary);
+    background: rgba(0, 212, 255, 0.1);
+    font-style: normal;
+    
+    &::before {
+      content: '💬';
+      display: block;
+      margin-bottom: 8px;
+    }
   }
   
   a {
-    color: #667eea;
+    color: #00d4ff;
     text-decoration: none;
+    border-bottom: 2px solid #00d4ff;
     
     &:hover {
-      text-decoration: underline;
+      background: #00d4ff;
+      color: #000;
     }
   }
 `;
@@ -210,26 +331,67 @@ const Tags = styled.div`
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid var(--card-border);
-  transition: border-color 0.3s ease;
 `;
 
 const Tag = styled.span`
-  padding: 6px 14px;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-  font-size: 0.8rem;
-  font-weight: 500;
-  border-radius: 20px;
+  font-family: ${pixelFont};
+  padding: 6px 12px;
+  background: var(--card-bg);
+  color: #00d4ff;
+  font-size: 0.5rem;
+  border: 2px solid var(--foreground);
+  box-shadow: 3px 3px 0 var(--foreground);
+  transition: all 0.1s ease;
+  
+  &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--foreground);
+  }
+`;
+
+const PixelDivider = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 32px 0;
+  
+  span {
+    width: 8px;
+    height: 8px;
+    background: var(--text-muted);
+  }
+`;
+
+const EndMark = styled.div`
+  font-family: ${pixelFont};
+  text-align: center;
+  margin-top: 48px;
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  
+  span {
+    color: #ff2d7b;
+    animation: ${blink} 2s ease-in-out infinite;
+    display: inline-block;
+  }
 `;
 
 // 根据分类生成封面背景色
 const getCoverColor = (category: string): string => {
   const colors: Record<string, string> = {
-    tech: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    design: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    product: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    tech: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+    design: 'linear-gradient(135deg, #2d132c 0%, #801336 100%)',
+    product: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
+  };
+  return colors[category] || colors.tech;
+};
+
+// 根据分类生成颜色
+const getCategoryColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    tech: '#00d4ff',
+    design: '#ff2d7b',
+    product: '#ffff00',
   };
   return colors[category] || colors.tech;
 };
@@ -246,7 +408,7 @@ const getCategoryIcon = (category: string): string => {
 
 // 生成头像背景色
 const getAvatarColor = (name: string): string => {
-  const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+  const colors = ['#00d4ff', '#ff2d7b', '#ffff00', '#00ff00', '#a78bfa'];
   const index = name.charCodeAt(0) % colors.length;
   return colors[index];
 };
@@ -266,6 +428,9 @@ export default function BlogDetailClient({
 }: BlogDetailClientProps) {
   return (
     <PageWrapper>
+      <Scanline />
+      <PixelGrid />
+      
       <Header navItems={navItems} />
       <Container>
         <BackLink href="/blog">
@@ -273,10 +438,10 @@ export default function BlogDetailClient({
         </BackLink>
         
         <CoverImage $bgColor={getCoverColor(post.category)}>
-          {getCategoryIcon(post.category)}
+          <IconWrapper>{getCategoryIcon(post.category)}</IconWrapper>
         </CoverImage>
         
-        <Category>
+        <Category $color={getCategoryColor(post.category)}>
           {post.category}
         </Category>
         
@@ -304,13 +469,20 @@ export default function BlogDetailClient({
           ))}
         </Content>
         
+        <PixelDivider>
+          <span /><span /><span /><span /><span />
+        </PixelDivider>
+        
         <Tags>
           {post.tags.map(tag => (
-            <Tag key={tag}>{tag}</Tag>
+            <Tag key={tag}>#{tag}</Tag>
           ))}
         </Tags>
+        
+        <EndMark>
+          ◆ END <span>_</span> ◆
+        </EndMark>
       </Container>
     </PageWrapper>
   );
 }
-

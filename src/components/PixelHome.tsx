@@ -195,14 +195,6 @@ const CTASection = styled.section`
   margin: 0 -24px;
 `;
 
-const CTATitle = styled.h2`
-  font-family: ${pixelFont};
-  font-size: 1rem;
-  color: var(--foreground);
-  margin-bottom: 24px;
-  animation: ${rainbow} 3s linear infinite;
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
   gap: 16px;
@@ -366,7 +358,6 @@ export default function PixelHome({ navItems, translations }: PixelHomeProps) {
         </FeaturesSection>
 
         <CTASection>
-          <CTATitle>{t.cta.title}</CTATitle>
           <ButtonGroup>
             <PixelButton href="/blog" $primary>
               {t.cta.blog}

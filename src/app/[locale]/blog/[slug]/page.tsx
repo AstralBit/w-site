@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getPostBySlug, getAllPosts } from '@/data/blog';
 import BlogDetailClient from '@/components/blog/BlogDetailClient';
 import { locales } from '@/i18n/routing';
+import { getNavItems } from '@/config/navigation';
 
 // 生成静态参数 - 为每个语言和每篇文章生成
 export function generateStaticParams() {
@@ -39,12 +40,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const t = await getTranslations('blog');
   const headerT = await getTranslations('header');
   
-  const navItems = [
-    { label: headerT('home'), href: '/' },
-    { label: headerT('blog'), href: '/blog' },
-    { label: headerT('about'), href: '/about' },
-    { label: headerT('contact'), href: '/contact' },
-  ];
+  const navItems = getNavItems(headerT);
 
   return (
     <BlogDetailClient 
@@ -55,4 +51,3 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     />
   );
 }
-

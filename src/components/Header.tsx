@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import styled, { keyframes } from 'styled-components';
-import { Link } from '../i18n/routing';
-import LanguageSwitcher from './LanguageSwitcher';
-import ThemeSwitcher from './ThemeSwitcher';
+import styled, { keyframes } from "styled-components";
+import { Link } from "../i18n/routing";
+import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeSwitcher from "./ThemeSwitcher";
+import GooeyNav from "./GooeyNav";
 
 // 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
@@ -23,10 +24,10 @@ const HeaderWrapper = styled.header`
   background: var(--header-bg);
   border-bottom: 4px solid var(--foreground);
   transition: background-color 0.3s ease;
-  
+
   /* 像素化扫描线效果 */
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -58,20 +59,20 @@ const Logo = styled(Link)`
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
-  
+
   &::before {
-    content: '◀';
+    content: "◀";
     color: #00d4ff;
     animation: ${pulse} 2s ease-in-out infinite;
   }
-  
+
   &::after {
-    content: '▶';
+    content: "▶";
     color: #ff2d7b;
     animation: ${pulse} 2s ease-in-out infinite;
     animation-delay: 1s;
   }
-  
+
   &:hover {
     color: #00d4ff;
     text-shadow: 2px 2px 0 #ff2d7b;
@@ -82,7 +83,7 @@ const Nav = styled.nav`
   display: flex;
   align-items: center;
   gap: 24px;
-  
+
   @media (max-width: 768px) {
     gap: 12px;
   }
@@ -92,7 +93,7 @@ const NavLinks = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -108,17 +109,17 @@ const NavLink = styled(Link)`
   position: relative;
   font-size: 1rem;
   font-weight: bold;
-  
+
   &:hover {
     color: var(--foreground);
     border-color: var(--foreground);
     background: var(--card-bg);
-    
+
     /* 像素化阴影 */
     box-shadow: 4px 4px 0 var(--foreground);
     transform: translate(-2px, -2px);
   }
-  
+
   &:active {
     transform: translate(0, 0);
     box-shadow: none;
@@ -136,7 +137,7 @@ const PixelDivider = styled.div`
   height: 24px;
   background: var(--foreground);
   margin: 0 8px;
-  
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -152,11 +153,11 @@ const MobileMenuButton = styled.button`
   color: var(--foreground);
   cursor: pointer;
   padding: 8px;
-  
+
   @media (max-width: 768px) {
     display: block;
   }
-  
+
   &:hover {
     color: #00d4ff;
   }
@@ -167,10 +168,10 @@ const PixelDot = styled.span<{ $color?: string; $delay?: number }>`
   display: inline-block;
   width: 8px;
   height: 8px;
-  background: ${props => props.$color || '#00d4ff'};
+  background: ${(props) => props.$color || "#00d4ff"};
   animation: ${pulse} 2s ease-in-out infinite;
-  animation-delay: ${props => props.$delay || 0}s;
-  
+  animation-delay: ${(props) => props.$delay || 0}s;
+
   @media (max-width: 640px) {
     width: 6px;
     height: 6px;
@@ -181,7 +182,7 @@ const PixelIndicator = styled.div`
   display: flex;
   gap: 4px;
   margin-right: 16px;
-  
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -197,42 +198,40 @@ interface HeaderProps {
   navItems?: NavItem[];
 }
 
-export default function Header({ 
-  logoText = 'PIXEL',
-  navItems = []
+export default function Header({
+  logoText = "PIXEL",
+  navItems = [],
 }: HeaderProps) {
   return (
     <HeaderWrapper>
       <HeaderInner>
-        <Logo href="/">
-          {logoText}
-        </Logo>
-        
+        <Logo href="/">{logoText}</Logo>
+
         <Nav>
           <PixelIndicator>
             <PixelDot $color="#ff2d7b" $delay={0} />
             <PixelDot $color="#ffff00" $delay={0.3} />
             <PixelDot $color="#00ff00" $delay={0.6} />
           </PixelIndicator>
-          
-          <NavLinks>
+
+          {/* <NavLinks>
             {navItems.map((item) => (
               <NavLink key={item.href} href={item.href}>
                 {item.label}
               </NavLink>
             ))}
-          </NavLinks>
-          
+          </NavLinks> */}
+
+          <GooeyNav timeVariance={1000} items={navItems} />
+
           <PixelDivider />
-          
+
           <Actions>
             <ThemeSwitcher />
             <LanguageSwitcher />
           </Actions>
-          
-          <MobileMenuButton aria-label="菜单">
-            ☰
-          </MobileMenuButton>
+
+          <MobileMenuButton aria-label="菜单">☰</MobileMenuButton>
         </Nav>
       </HeaderInner>
     </HeaderWrapper>

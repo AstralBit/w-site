@@ -1,16 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import PixelHome from "@/components/PixelHome";
+import { getNavItems } from "@/config/navigation";
 
 export default async function Home() {
   const headerT = await getTranslations("header");
   const homeT = await getTranslations("home");
   
-  const navItems = [
-    { label: headerT("home"), href: "/" },
-    { label: headerT("blog"), href: "/blog" },
-    { label: headerT("about"), href: "/about" },
-    { label: headerT("contact"), href: "/contact" },
-  ];
+  const navItems = getNavItems(headerT);
 
   // 构建翻译对象传递给客户端组件
   const translations = {
@@ -33,17 +29,7 @@ export default async function Home() {
           icon: homeT("features.items.1.icon"),
           title: homeT("features.items.1.title"),
           desc: homeT("features.items.1.desc"),
-        },
-        {
-          icon: homeT("features.items.2.icon"),
-          title: homeT("features.items.2.title"),
-          desc: homeT("features.items.2.desc"),
-        },
-        {
-          icon: homeT("features.items.3.icon"),
-          title: homeT("features.items.3.title"),
-          desc: homeT("features.items.3.desc"),
-        },
+        }
       ],
     },
     cta: {
