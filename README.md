@@ -1,6 +1,9 @@
 # 🎮 Pixel Portfolio
 
 一个像素风格的个人网站，使用 Next.js 16 + styled-components 构建，支持中英文双语。
+<img width="1980" height="1242" alt="局部截取_20260115_171239" src="https://github.com/user-attachments/assets/78787595-e2c9-439a-941f-ae819497bdaf" />
+
+
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
