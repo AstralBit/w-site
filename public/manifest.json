@@ -1,0 +1,22 @@
+{
+  "name": "Pixel Dev | 像素开发者",
+  "short_name": "Pixel Dev",
+  "description": "一个热爱代码的全栈工程师，专注于创造有趣的数字体验。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#00d4ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["portfolio", "personal", "developer"],
+  "lang": "zh-CN",
+  "dir": "ltr"
+}
+
