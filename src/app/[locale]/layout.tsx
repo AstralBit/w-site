@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { routing } from "@/i18n/routing";
+import { notFound } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,14 +26,27 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LocaleLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
+  
+  // 验证 locale 是否有效
+  if (!routing.locales.includes(locale as typeof routing.locales[number])) {
+    notFound();
+  }
+  
+  // 获取当前 locale 的消息
+  const messages = await getMessages();
+  
   return (
-    <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      {children}
-    </div>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
+      </div>
+    </NextIntlClientProvider>
   );
 }
 

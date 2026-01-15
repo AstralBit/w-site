@@ -1,5 +1,3 @@
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 import { defaultLocale } from '../i18n/routing';
 import StyledComponentsRegistry from '../lib/StyledComponentsRegistry';
 import './globals.css';
@@ -20,13 +18,11 @@ const themeScript = `
   })();
 `;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const messages = await getMessages();
-
   return (
     <html lang={defaultLocale} suppressHydrationWarning>
       <head>
@@ -38,9 +34,7 @@ export default async function RootLayout({
       </head>
       <body>
         <StyledComponentsRegistry>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
+          {children}
         </StyledComponentsRegistry>
       </body>
     </html>
