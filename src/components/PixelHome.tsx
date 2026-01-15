@@ -14,33 +14,9 @@ const float = keyframes`
   50% { transform: translateY(-10px); }
 `;
 
-const blink = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-`;
-
 const scanline = keyframes`
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100vh); }
-`;
-
-const glitch = keyframes`
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
-`;
-
-const rainbow = keyframes`
-  0% { color: #ff0000; }
-  16% { color: #ff8800; }
-  33% { color: #ffff00; }
-  50% { color: #00ff00; }
-  66% { color: #0088ff; }
-  83% { color: #8800ff; }
-  100% { color: #ff0000; }
 `;
 
 // 样式组件
@@ -100,19 +76,6 @@ const Container = styled.main`
 const HeroSection = styled.section`
   text-align: center;
   margin-bottom: 80px;
-`;
-
-const Subtitle = styled.p`
-  font-family: ${pixelFont};
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 2;
-  max-width: 600px;
-  margin: 0 auto;
-
-  @media (max-width: 640px) {
-    font-size: 0.75rem;
-  }
 `;
 
 const FeaturesSection = styled.section`
@@ -180,51 +143,6 @@ const FeatureDesc = styled.p`
   font-size: 0.625rem;
   color: var(--text-secondary);
   line-height: 2;
-`;
-
-const CTASection = styled.section`
-  text-align: center;
-  padding: 60px 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--card-border) 10%,
-    var(--card-border) 90%,
-    transparent 100%
-  );
-  margin: 0 -24px;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-`;
-
-const PixelButton = styled(Link)<{ $primary?: boolean }>`
-  font-family: ${pixelFont};
-  font-size: 0.75rem;
-  padding: 16px 32px;
-  border: 4px solid var(--foreground);
-  background: ${(props) => (props.$primary ? "#00d4ff" : "var(--card-bg)")};
-  color: ${(props) => (props.$primary ? "#000" : "var(--foreground)")};
-  text-decoration: none;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.1s ease;
-
-  box-shadow: 4px 4px 0 var(--foreground);
-
-  &:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 var(--foreground);
-  }
-
-  &:active {
-    transform: translate(4px, 4px);
-    box-shadow: none;
-  }
 `;
 
 const Footer = styled.footer`
@@ -356,15 +274,6 @@ export default function PixelHome({ navItems, translations }: PixelHomeProps) {
             ))}
           </FeatureGrid>
         </FeaturesSection>
-
-        <CTASection>
-          <ButtonGroup>
-            <PixelButton href="/blog" $primary>
-              {t.cta.blog}
-            </PixelButton>
-            <PixelButton href="/contact">{t.cta.contact}</PixelButton>
-          </ButtonGroup>
-        </CTASection>
 
         <Footer>
           <PixelDivider>

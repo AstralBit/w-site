@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { Link } from "../i18n/routing";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -12,6 +13,22 @@ const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
 const pulse = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+`;
+
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const blink = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 `;
 
 const HeaderWrapper = styled.header`
@@ -143,22 +160,146 @@ const PixelDivider = styled.div`
 `;
 
 // 像素风格的移动端菜单按钮
-const MobileMenuButton = styled.button`
+const MobileMenuButton = styled.button<{ $isOpen?: boolean }>`
   display: none;
   font-family: ${pixelFont};
   font-size: 1.25rem;
-  background: transparent;
-  border: none;
-  color: var(--foreground);
+  background: ${props => props.$isOpen ? '#00d4ff' : 'transparent'};
+  border: 2px solid var(--foreground);
+  color: ${props => props.$isOpen ? '#000' : 'var(--foreground)'};
   cursor: pointer;
-  padding: 8px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  box-shadow: ${props => props.$isOpen ? 'none' : '2px 2px 0 var(--foreground)'};
+  transform: ${props => props.$isOpen ? 'translate(2px, 2px)' : 'translate(0, 0)'};
 
   @media (max-width: 768px) {
     display: block;
   }
 
   &:hover {
+    background: ${props => props.$isOpen ? '#00d4ff' : 'var(--card-bg)'};
+    color: ${props => props.$isOpen ? '#000' : '#00d4ff'};
+  }
+
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+`;
+
+// 移动端菜单面板
+const MobileMenu = styled.div<{ $isOpen: boolean }>`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.$isOpen ? 'block' : 'none'};
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--header-bg);
+    border-top: 4px solid var(--foreground);
+    border-bottom: 4px solid var(--foreground);
+    box-shadow: 0 8px 0 var(--foreground);
+    padding: 16px;
+    animation: ${slideIn} 0.2s ease-out;
+    
+    /* 像素化扫描线效果 */
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.03) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+  }
+`;
+
+// 移动端导航链接容器
+const MobileNavLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+`;
+
+// 移动端导航链接
+const MobileNavLink = styled(Link)`
+  font-family: ${pixelFont};
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 12px 16px;
+  border: 2px solid var(--foreground);
+  background: var(--card-bg);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 4px 4px 0 var(--foreground);
+
+  &::before {
+    content: "▶";
     color: #00d4ff;
+    font-size: 0.5rem;
+  }
+
+  &:hover, &:active {
+    background: #00d4ff;
+    color: #000;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--foreground);
+  }
+`;
+
+// 移动端操作区域
+const MobileActions = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 2px dashed var(--card-border);
+`;
+
+// 移动端菜单标题
+const MobileMenuTitle = styled.div`
+  font-family: ${pixelFont};
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: "◆";
+    color: #ff2d7b;
+  }
+
+  &::after {
+    content: "_";
+    animation: ${blink} 1s step-end infinite;
+  }
+`;
+
+// 遮罩层
+const Overlay = styled.div<{ $isOpen: boolean }>`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.$isOpen ? 'block' : 'none'};
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
   }
 `;
 
@@ -201,6 +342,16 @@ export default function Header({
   logoText = "PIXEL",
   navItems = [],
 }: HeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <HeaderWrapper>
       <HeaderInner>
@@ -228,8 +379,38 @@ export default function Header({
             <LanguageSwitcher />
           </Actions>
 
-          <MobileMenuButton aria-label="菜单">☰</MobileMenuButton>
+          <MobileMenuButton 
+            $isOpen={isMobileMenuOpen}
+            onClick={toggleMobileMenu}
+            aria-label="菜单"
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </MobileMenuButton>
         </Nav>
+
+        {/* 移动端菜单 */}
+        <MobileMenu $isOpen={isMobileMenuOpen}>
+          <MobileMenuTitle>MENU</MobileMenuTitle>
+          <MobileNavLinks>
+            {navItems.map((item) => (
+              <MobileNavLink 
+                key={item.href} 
+                href={item.href}
+                onClick={closeMobileMenu}
+              >
+                {item.label}
+              </MobileNavLink>
+            ))}
+          </MobileNavLinks>
+          <MobileActions>
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+          </MobileActions>
+        </MobileMenu>
+        
+        {/* 遮罩层 */}
+        <Overlay $isOpen={isMobileMenuOpen} onClick={closeMobileMenu} />
       </HeaderInner>
     </HeaderWrapper>
   );

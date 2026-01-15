@@ -53,6 +53,59 @@
       "contact": "Contact Me"
     },
     "footer": "Built with code and passion"
+  },
+  "about": {
+    "title": "ABOUT ME",
+    "subtitle": "A full-stack developer",
+    "bio": {
+      "title": "BIO",
+      "content": "Hello! I'm a passionate full-stack developer focused on creating unique digital experiences. I believe good code is like art - every pixel needs to be carefully crafted."
+    },
+    "journey": {
+      "title": "MY JOURNEY",
+      "items": [
+        {
+          "year": "2018",
+          "event": "Started coding journey",
+          "icon": "🎮"
+        },
+        {
+          "year": "2020",
+          "event": "Became full-stack dev",
+          "icon": "💻"
+        }
+      ]
+    },
+    "skills": {
+      "title": "SKILL POINTS",
+      "items": [
+        { "name": "React/Next.js", "level": 95 },
+        { "name": "TypeScript", "level": 90 },
+        { "name": "Node.js", "level": 85 },
+        { "name": "Python", "level": 80 },
+        { "name": "UI/UX Design", "level": 75 }
+      ]
+    },
+    "interests": {
+      "title": "INTERESTS",
+      "items": [
+        { "icon": "🎮", "name": "Gaming" },
+        { "icon": "📚", "name": "Reading" },
+        { "icon": "🎵", "name": "Music" },
+        { "icon": "☕", "name": "Coffee" },
+        { "icon": "🌏", "name": "Travel" },
+        { "icon": "🎨", "name": "Pixel Art" }
+      ]
+    },
+    "contact": {
+      "title": "CONTACT",
+      "email": "astralbit@163.com",
+      "github": "https://github.com/AstralBit"
+    },
+    "cta": {
+      "title": "WANT TO COLLABORATE?",
+      "button": "Send Message"
+    }
   }
 }
 
