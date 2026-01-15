@@ -114,6 +114,7 @@ const TerminalHeader = styled.div`
   position: relative;
   backdrop-filter: blur(10px);
   animation: ${pulse} 4s ease-in-out infinite;
+  width: 100%;
 
   /* 像素角 */
   clip-path: polygon(
@@ -131,7 +132,6 @@ const TerminalHeader = styled.div`
     left: -3px;
     right: -3px;
     bottom: -3px;
-    background: linear-gradient(45deg, #00ff41, #00d4ff, #ff2d7b, #ffff00, #00ff41);
     background-size: 400% 400%;
     animation: ${neonFlicker} 3s ease-in-out infinite;
     z-index: -1;
