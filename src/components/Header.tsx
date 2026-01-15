@@ -64,6 +64,22 @@ const scanline = keyframes`
   100% { top: 100%; }
 `;
 
+const neonPulse = keyframes`
+  0%, 100% { 
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+    opacity: 0.9;
+  }
+`;
+
+const starTwinkle = keyframes`
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+`;
+
 // ========== 样式组件 ==========
 const HeaderWrapper = styled.header`
   position: fixed;
@@ -71,9 +87,10 @@ const HeaderWrapper = styled.header`
   left: 0;
   right: 0;
   z-index: 100;
-  background: var(--header-bg);
-  border-bottom: 3px solid var(--foreground);
+  background: rgba(5, 5, 15, 0.95);
+  border-bottom: 2px solid #00ff41;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 
   /* CRT 扫描线效果 */
   &::before {
@@ -85,7 +102,7 @@ const HeaderWrapper = styled.header`
     height: 100%;
     background: linear-gradient(
       transparent 0%,
-      rgba(255, 255, 255, 0.03) 50%,
+      rgba(0, 255, 65, 0.03) 50%,
       transparent 100%
     );
     animation: ${scanline} 4s linear infinite;
@@ -93,26 +110,29 @@ const HeaderWrapper = styled.header`
     z-index: 10;
   }
 
-  /* 底部像素装饰条 */
+  /* 底部霓虹彩虹条 */
   &::after {
     content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 3px;
-    background: repeating-linear-gradient(
+    height: 2px;
+    background: linear-gradient(
       90deg,
-      #ff2d7b 0px,
-      #ff2d7b 8px,
-      #00d4ff 8px,
-      #00d4ff 16px,
-      #ffff00 16px,
-      #ffff00 24px,
-      #00ff41 24px,
-      #00ff41 32px
+      #ff2d7b 0%,
+      #ff2d7b 20%,
+      #ffff00 20%,
+      #ffff00 40%,
+      #00ff41 40%,
+      #00ff41 60%,
+      #00d4ff 60%,
+      #00d4ff 80%,
+      #a78bfa 80%,
+      #a78bfa 100%
     );
     animation: ${rainbow} 8s linear infinite;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
   }
 `;
 
@@ -137,7 +157,7 @@ const LogoArea = styled.div`
 const TerminalIcon = styled.div`
   width: 32px;
   height: 32px;
-  background: #0a0a0a;
+  background: rgba(0, 255, 65, 0.1);
   border: 2px solid #00ff41;
   display: flex;
   align-items: center;
@@ -145,6 +165,7 @@ const TerminalIcon = styled.div`
   font-size: 14px;
   animation: ${float} 3s ease-in-out infinite;
   position: relative;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3), inset 0 0 10px rgba(0, 255, 65, 0.1);
   
   &::before {
     content: ">";
@@ -152,6 +173,7 @@ const TerminalIcon = styled.div`
     font-family: ${pixelFont};
     font-size: 12px;
     animation: ${cursorBlink} 1s step-end infinite;
+    text-shadow: 0 0 10px #00ff41;
   }
 `;
 
@@ -162,6 +184,7 @@ const LogoText = styled(Link)`
   text-decoration: none;
   position: relative;
   letter-spacing: 2px;
+  text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
   
   /* 打字机效果容器 */
   &::after {
@@ -173,6 +196,8 @@ const LogoText = styled(Link)`
   &:hover {
     animation: ${glitchAnim} 0.3s ease-in-out;
     text-shadow: 
+      0 0 10px #00ff41,
+      0 0 20px #00ff41,
       2px 0 #ff2d7b,
       -2px 0 #00d4ff;
   }
@@ -187,10 +212,19 @@ const StatusBar = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 6px 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid var(--card-border);
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(0, 255, 65, 0.3);
   border-radius: 0;
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.5);
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
 
   @media (max-width: 900px) {
     display: none;
@@ -203,18 +237,22 @@ const StatusItem = styled.div<{ $color?: string }>`
   gap: 6px;
   font-family: ${pixelFont};
   font-size: 0.5rem;
-  color: ${props => props.$color || 'var(--text-secondary)'};
+  color: ${props => props.$color || '#888'};
 `;
 
-const StatusIcon = styled.span<{ $animate?: boolean }>`
+const StatusIcon = styled.span<{ $animate?: boolean; $color?: string }>`
   font-size: 12px;
   ${props => props.$animate && css`
     animation: ${bounce} 1s ease-in-out infinite;
   `}
+  ${props => props.$color && css`
+    filter: drop-shadow(0 0 5px ${props.$color});
+  `}
 `;
 
-const StatusValue = styled.span`
-  color: var(--foreground);
+const StatusValue = styled.span<{ $color?: string }>`
+  color: ${props => props.$color || '#fff'};
+  text-shadow: ${props => props.$color ? `0 0 10px ${props.$color}` : 'none'};
 `;
 
 // 导航区域 - 像素按钮风格
@@ -231,16 +269,19 @@ const Nav = styled.nav`
 const NavButton = styled.button<{ $active?: boolean }>`
   font-family: ${pixelFont};
   font-size: 0.8rem;
-  color: ${props => props.$active ? '#0a0a0a' : 'var(--text-secondary)'};
-  background: ${props => props.$active ? '#00ff41' : 'transparent'};
-  border: 2px solid ${props => props.$active ? '#00ff41' : 'var(--card-border)'};
+  color: ${props => props.$active ? '#0a0a0a' : '#aaa'};
+  background: ${props => props.$active ? '#00ff41' : 'rgba(0, 0, 0, 0.5)'};
+  border: 2px solid ${props => props.$active ? '#00ff41' : 'rgba(0, 255, 65, 0.3)'};
   padding: 8px 14px;
   cursor: pointer;
   position: relative;
-  transition: all 0.1s ease;
+  transition: all 0.15s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: bold;
+  ${props => props.$active && css`
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.5), inset 0 0 10px rgba(0, 255, 65, 0.3);
+  `}
 
   /* 像素角 */
   clip-path: polygon(
@@ -255,6 +296,9 @@ const NavButton = styled.button<{ $active?: boolean }>`
     margin-right: 6px;
     font-size: 8px;
     color: ${props => props.$active ? '#0a0a0a' : '#ff2d7b'};
+    ${props => !props.$active && css`
+      text-shadow: 0 0 10px #ff2d7b;
+    `}
   }
 
   &:hover {
@@ -263,18 +307,20 @@ const NavButton = styled.button<{ $active?: boolean }>`
     border-color: #00d4ff;
     transform: translate(-2px, -2px);
     box-shadow: 
-      2px 2px 0 var(--foreground),
-      4px 4px 0 #ff2d7b;
+      2px 2px 0 #00ff41,
+      4px 4px 0 #ff2d7b,
+      0 0 20px rgba(0, 212, 255, 0.5);
 
     &::before {
       content: "◆";
       color: #0a0a0a;
+      text-shadow: none;
     }
   }
 
   &:active {
     transform: translate(0, 0);
-    box-shadow: none;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
   }
 
   &[data-loading="true"] {
@@ -300,7 +346,12 @@ const PixelSeparator = styled.div`
   span {
     width: 4px;
     height: 4px;
-    background: var(--text-muted);
+    background: #333;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+
+    &:nth-child(1) { background: #ff2d7b; box-shadow: 0 0 5px #ff2d7b; }
+    &:nth-child(2) { background: #00ff41; box-shadow: 0 0 5px #00ff41; }
+    &:nth-child(3) { background: #00d4ff; box-shadow: 0 0 5px #00d4ff; }
   }
 
   @media (max-width: 768px) {
@@ -314,12 +365,29 @@ const PixelCharacter = styled.div`
   animation: ${float} 2s ease-in-out infinite;
   cursor: default;
   user-select: none;
+  filter: drop-shadow(0 0 10px rgba(255, 200, 0, 0.5));
 
   &:hover {
     animation: ${rotate} 0.5s linear;
+    filter: drop-shadow(0 0 20px rgba(255, 200, 0, 0.8));
   }
 
   @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+// 星星装饰
+const StarDecor = styled.span<{ $delay: number }>`
+  position: absolute;
+  font-size: 8px;
+  color: #fff;
+  animation: ${starTwinkle} 2s ease-in-out infinite;
+  animation-delay: ${props => props.$delay}s;
+  opacity: 0.6;
+  pointer-events: none;
+
+  @media (max-width: 768px) {
     display: none;
   }
 `;
@@ -329,13 +397,19 @@ const MobileMenuBtn = styled.button<{ $isOpen: boolean }>`
   display: none;
   font-family: ${pixelFont};
   font-size: 10px;
-  background: ${props => props.$isOpen ? '#ff2d7b' : 'transparent'};
-  border: 2px solid var(--foreground);
-  color: ${props => props.$isOpen ? '#fff' : 'var(--foreground)'};
+  background: ${props => props.$isOpen ? '#ff2d7b' : 'rgba(0, 0, 0, 0.5)'};
+  border: 2px solid ${props => props.$isOpen ? '#ff2d7b' : '#00ff41'};
+  color: ${props => props.$isOpen ? '#fff' : '#00ff41'};
   padding: 10px;
   cursor: pointer;
   position: relative;
   transition: all 0.15s ease;
+  ${props => props.$isOpen && css`
+    box-shadow: 0 0 15px rgba(255, 45, 123, 0.5);
+  `}
+  ${props => !props.$isOpen && css`
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+  `}
 
   clip-path: polygon(
     0 4px, 4px 4px, 4px 0,
@@ -353,7 +427,9 @@ const MobileMenuBtn = styled.button<{ $isOpen: boolean }>`
 
   &:hover {
     background: #00d4ff;
+    border-color: #00d4ff;
     color: #0a0a0a;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
   }
 `;
 
@@ -368,18 +444,22 @@ const MobilePanel = styled.div<{ $isOpen: boolean }>`
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--background);
+    background: rgba(5, 5, 15, 0.98);
     transform: translateX(${props => props.$isOpen ? '0' : '100%'});
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 99;
     padding: 24px;
     overflow-y: auto;
 
-    /* 网格背景 */
+    /* 星空网格背景 */
     background-image: 
-      linear-gradient(var(--card-border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
-    background-size: 20px 20px;
+      radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 40px 70px, rgba(0,255,65,0.3), transparent),
+      radial-gradient(1px 1px at 50px 160px, rgba(0,212,255,0.3), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(255,45,123,0.3), transparent),
+      linear-gradient(rgba(0, 255, 65, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 65, 0.02) 1px, transparent 1px);
+    background-size: 200px 200px, 200px 200px, 200px 200px, 200px 200px, 30px 30px, 30px 30px;
   }
 `;
 
@@ -391,10 +471,12 @@ const MobileTitle = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  text-shadow: 0 0 10px #00ff41;
 
   &::before {
     content: "//";
     color: #ff2d7b;
+    text-shadow: 0 0 10px #ff2d7b;
   }
 
   &::after {
@@ -413,9 +495,9 @@ const MobileNavList = styled.div`
 const MobileNavItem = styled.button<{ $index: number }>`
   font-family: ${pixelFont};
   font-size: 0.65rem;
-  color: var(--foreground);
-  background: var(--card-bg);
-  border: 3px solid var(--foreground);
+  color: #fff;
+  background: rgba(0, 255, 65, 0.05);
+  border: 2px solid rgba(0, 255, 65, 0.3);
   padding: 16px 20px;
   cursor: pointer;
   text-align: left;
@@ -424,6 +506,14 @@ const MobileNavItem = styled.button<{ $index: number }>`
   animation: slideInRight 0.3s ease-out;
   animation-delay: ${props => props.$index * 0.1}s;
   animation-fill-mode: both;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 6px, 6px 6px, 6px 0,
+    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+  );
 
   @keyframes slideInRight {
     from {
@@ -441,6 +531,7 @@ const MobileNavItem = styled.button<{ $index: number }>`
     font-size: 0.5rem;
     color: #ff2d7b;
     margin-right: 12px;
+    text-shadow: 0 0 10px #ff2d7b;
   }
 
   &::after {
@@ -452,21 +543,26 @@ const MobileNavItem = styled.button<{ $index: number }>`
     color: #00d4ff;
     opacity: 0;
     transition: all 0.15s ease;
+    text-shadow: 0 0 10px #00d4ff;
   }
 
   &:hover {
     background: #00ff41;
+    border-color: #00ff41;
     color: #0a0a0a;
     transform: translateX(8px);
-    box-shadow: -8px 0 0 #ff2d7b;
+    box-shadow: -8px 0 0 #ff2d7b, 0 0 20px rgba(0, 255, 65, 0.5);
 
     &::before {
       color: #0a0a0a;
+      text-shadow: none;
     }
 
     &::after {
       opacity: 1;
       right: 12px;
+      color: #0a0a0a;
+      text-shadow: none;
     }
   }
 `;
@@ -476,7 +572,7 @@ const MobileActions = styled.div`
   align-items: center;
   gap: 16px;
   padding-top: 24px;
-  border-top: 2px dashed var(--card-border);
+  border-top: 2px dashed rgba(0, 255, 65, 0.3);
 `;
 
 const MobileFooter = styled.div`
@@ -486,11 +582,12 @@ const MobileFooter = styled.div`
   right: 24px;
   font-family: ${pixelFont};
   font-size: 0.4rem;
-  color: var(--text-muted);
+  color: #666;
   text-align: center;
 
   span {
     color: #ff2d7b;
+    text-shadow: 0 0 10px #ff2d7b;
   }
 `;
 
@@ -575,6 +672,12 @@ export default function Header({
   return (
     <>
       <HeaderWrapper>
+        {/* 星星装饰 */}
+        <StarDecor $delay={0} style={{ top: '15%', left: '30%' }}>✦</StarDecor>
+        <StarDecor $delay={0.5} style={{ top: '60%', left: '45%' }}>✧</StarDecor>
+        <StarDecor $delay={1} style={{ top: '25%', right: '35%' }}>✦</StarDecor>
+        <StarDecor $delay={1.5} style={{ top: '70%', right: '25%' }}>✧</StarDecor>
+
         <HeaderInner>
           {/* Logo 区域 */}
           <LogoArea>
@@ -585,16 +688,16 @@ export default function Header({
           {/* 状态栏 */}
           <StatusBar>
             <StatusItem $color="#00ff41">
-              <StatusIcon $animate>⚡</StatusIcon>
-              <StatusValue>ONLINE</StatusValue>
+              <StatusIcon $animate $color="#00ff41">⚡</StatusIcon>
+              <StatusValue $color="#00ff41">ONLINE</StatusValue>
             </StatusItem>
             <StatusItem>
-              <StatusIcon>🕐</StatusIcon>
-              <StatusValue>{time}</StatusValue>
+              <StatusIcon $color="#00d4ff">🕐</StatusIcon>
+              <StatusValue $color="#00d4ff">{time}</StatusValue>
             </StatusItem>
             <StatusItem $color="#ffff00">
-              <StatusIcon>★</StatusIcon>
-              <StatusValue>LV.99</StatusValue>
+              <StatusIcon $color="#ffff00">★</StatusIcon>
+              <StatusValue $color="#ffff00">LV.99</StatusValue>
             </StatusItem>
           </StatusBar>
 
@@ -614,7 +717,7 @@ export default function Header({
 
           {/* 右侧区域 */}
           <RightArea>
-            <PixelCharacter title="Hello!">🎮</PixelCharacter>
+            <PixelCharacter title="Hello!">🚀</PixelCharacter>
             
             <PixelSeparator>
               <span />

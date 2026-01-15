@@ -6,8 +6,8 @@ import styled, { keyframes } from 'styled-components';
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
 
 const glow = keyframes`
-  0%, 100% { box-shadow: 0 0 5px currentColor; }
-  50% { box-shadow: 0 0 15px currentColor, 0 0 25px currentColor; }
+  0%, 100% { box-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+  50% { box-shadow: 0 0 15px currentColor, 0 0 25px currentColor, 0 0 35px currentColor; }
 `;
 
 const spin = keyframes`
@@ -19,15 +19,18 @@ const SwitcherButton = styled.button<{ $isDark: boolean }>`
   font-family: ${pixelFont};
   font-size: 0.5rem;
   padding: 8px 12px;
-  border: 2px solid ${props => props.$isDark ? '#fbbf24' : '#a78bfa'};
-  background: transparent;
-  color: ${props => props.$isDark ? '#fbbf24' : '#a78bfa'};
+  border: 2px solid ${props => props.$isDark ? '#ffff00' : '#a78bfa'};
+  background: rgba(0, 0, 0, 0.5);
+  color: ${props => props.$isDark ? '#ffff00' : '#a78bfa'};
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   transition: all 0.15s ease;
   position: relative;
+  box-shadow: ${props => props.$isDark 
+    ? '0 0 10px rgba(255, 255, 0, 0.3), inset 0 0 10px rgba(255, 255, 0, 0.1)' 
+    : '0 0 10px rgba(167, 139, 250, 0.3), inset 0 0 10px rgba(167, 139, 250, 0.1)'};
 
   /* 像素角 */
   clip-path: polygon(
@@ -38,9 +41,12 @@ const SwitcherButton = styled.button<{ $isDark: boolean }>`
   );
 
   &:hover {
-    background: ${props => props.$isDark ? '#fbbf24' : '#a78bfa'};
+    background: ${props => props.$isDark ? '#ffff00' : '#a78bfa'};
     color: #0a0a0a;
     animation: ${glow} 1s ease-in-out infinite;
+    box-shadow: ${props => props.$isDark 
+      ? '0 0 20px rgba(255, 255, 0, 0.5)' 
+      : '0 0 20px rgba(167, 139, 250, 0.5)'};
 
     .icon {
       animation: ${spin} 0.5s ease-out;
@@ -54,6 +60,15 @@ const SwitcherButton = styled.button<{ $isDark: boolean }>`
   .icon {
     font-size: 14px;
     display: inline-block;
+    filter: ${props => props.$isDark 
+      ? 'drop-shadow(0 0 5px #ffff00)' 
+      : 'drop-shadow(0 0 5px #a78bfa)'};
+  }
+
+  .label {
+    text-shadow: ${props => props.$isDark 
+      ? '0 0 10px #ffff00' 
+      : '0 0 10px #a78bfa'};
   }
 
   @media (max-width: 640px) {

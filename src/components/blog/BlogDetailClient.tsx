@@ -4,15 +4,11 @@ import styled, { keyframes } from 'styled-components';
 import { Link } from '../../i18n/routing';
 import { BlogPost } from '@/types/blog';
 import Header from '../Header';
+import CyberBackground from '../CyberBackground';
 import { Locale } from '@/i18n/routing';
 import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
 
 // ========== 动画 ==========
-const scanline = keyframes`
-  0% { top: -100%; }
-  100% { top: 200%; }
-`;
-
 const float = keyframes`
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -43,42 +39,20 @@ const pulse = keyframes`
   50% { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
 `;
 
+const neonFlicker = keyframes`
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  96% { opacity: 0.9; }
+  97% { opacity: 1; }
+`;
+
 // ========== 样式组件 ==========
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: var(--background);
   position: relative;
   overflow: hidden;
-`;
-
-const Scanline = styled.div`
-  position: fixed;
-  top: -100%;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(
-    transparent 0%,
-    rgba(255, 255, 255, 0.02) 50%,
-    transparent 100%
-  );
-  animation: ${scanline} 6s linear infinite;
-  pointer-events: none;
-  z-index: 100;
-`;
-
-const PixelGrid = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    linear-gradient(var(--card-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.15;
-  pointer-events: none;
 `;
 
 const Container = styled.main`
@@ -680,8 +654,8 @@ export default function BlogDetailClient({
 }: BlogDetailClientProps) {
   return (
     <PageWrapper>
-      <Scanline />
-      <PixelGrid />
+      {/* 赛博朋克背景 */}
+      <CyberBackground />
       
       <Header navItems={navItems} />
       

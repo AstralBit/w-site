@@ -4,15 +4,11 @@ import styled, { keyframes } from 'styled-components';
 import { BlogPost } from '@/types/blog';
 import BlogList from './BlogList';
 import Header from '../Header';
+import CyberBackground from '../CyberBackground';
 import { Locale } from '@/i18n/routing';
 import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
 
 // ========== 动画 ==========
-const scanline = keyframes`
-  0% { top: -100%; }
-  100% { top: 200%; }
-`;
-
 const glitch = keyframes`
   0%, 100% { 
     text-shadow: 2px 0 #ff2d7b, -2px 0 #00d4ff;
@@ -20,19 +16,19 @@ const glitch = keyframes`
   }
   20% { 
     text-shadow: -2px 0 #ff2d7b, 2px 0 #00d4ff;
-    transform: translate(-1px, 1px);
+    transform: translate(-2px, 2px);
   }
   40% { 
     text-shadow: 2px 0 #ff2d7b, -2px 0 #00d4ff;
-    transform: translate(1px, -1px);
+    transform: translate(2px, -2px);
   }
   60% { 
     text-shadow: -2px 0 #ff2d7b, 2px 0 #00d4ff;
-    transform: translate(-1px, -1px);
+    transform: translate(-2px, -2px);
   }
   80% { 
     text-shadow: 2px 0 #ff2d7b, -2px 0 #00d4ff;
-    transform: translate(1px, 1px);
+    transform: translate(2px, 2px);
   }
 `;
 
@@ -43,62 +39,55 @@ const blink = keyframes`
 
 const float = keyframes`
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-15px) rotate(5deg); }
-  75% { transform: translateY(5px) rotate(-5deg); }
+  25% { transform: translateY(-20px) rotate(5deg); }
+  75% { transform: translateY(10px) rotate(-5deg); }
+`;
+
+const pulse = keyframes`
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4);
+  }
+  50% { 
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 5px rgba(0, 255, 65, 0.2);
+  }
+`;
+
+const typewriter = keyframes`
+  from { width: 0; }
+  to { width: 100%; }
+`;
+
+const neonFlicker = keyframes`
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  96% { opacity: 0.9; }
+  97% { opacity: 1; }
 `;
 
 // ========== 样式组件 ==========
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: var(--background);
   position: relative;
   overflow: hidden;
 `;
 
-// CRT 扫描线
-const Scanline = styled.div`
-  position: fixed;
-  top: -100%;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(
-    transparent 0%,
-    rgba(255, 255, 255, 0.02) 50%,
-    transparent 100%
-  );
-  animation: ${scanline} 6s linear infinite;
-  pointer-events: none;
-  z-index: 100;
-`;
-
-// 像素网格背景
-const PixelGrid = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    linear-gradient(var(--card-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.2;
-  pointer-events: none;
-`;
-
-// 浮动装饰
-const FloatingDecor = styled.div<{ $top: string; $left?: string; $right?: string; $delay: number }>`
+// 浮动装饰 - 更大更明显
+const FloatingDecor = styled.div<{ $top: string; $left?: string; $right?: string; $delay: number; $size?: string }>`
   position: fixed;
   top: ${props => props.$top};
   left: ${props => props.$left || 'auto'};
   right: ${props => props.$right || 'auto'};
-  font-size: 2rem;
-  opacity: 0.15;
-  animation: ${float} 6s ease-in-out infinite;
+  font-size: ${props => props.$size || '3rem'};
+  opacity: 0.2;
+  animation: ${float} 8s ease-in-out infinite;
   animation-delay: ${props => props.$delay}s;
   pointer-events: none;
   z-index: 1;
+  filter: drop-shadow(0 0 10px currentColor);
 
   @media (max-width: 768px) {
     display: none;
@@ -121,41 +110,65 @@ const PageHeader = styled.div`
   position: relative;
 `;
 
-// 终端风格标题区域
+// 终端风格标题区域 - 增强版
 const TerminalHeader = styled.div`
   display: inline-block;
-  background: rgba(0, 0, 0, 0.3);
-  border: 3px solid var(--foreground);
-  padding: 32px 48px;
+  background: rgba(10, 10, 10, 0.8);
+  border: 3px solid #00ff41;
+  padding: 40px 60px;
   position: relative;
+  backdrop-filter: blur(10px);
+  animation: ${pulse} 4s ease-in-out infinite;
 
   /* 像素角 */
   clip-path: polygon(
-    0 12px, 12px 12px, 12px 0,
-    calc(100% - 12px) 0, calc(100% - 12px) 12px, 100% 12px,
-    100% calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) 100%,
-    12px 100%, 12px calc(100% - 12px), 0 calc(100% - 12px)
+    0 16px, 16px 16px, 16px 0,
+    calc(100% - 16px) 0, calc(100% - 16px) 16px, 100% 16px,
+    100% calc(100% - 16px), calc(100% - 16px) calc(100% - 16px), calc(100% - 16px) 100%,
+    16px 100%, 16px calc(100% - 16px), 0 calc(100% - 16px)
   );
 
-  /* 顶部装饰条 */
+  /* 霓虹边框效果 */
   &::before {
     content: '';
     position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #00ff41, #00d4ff, #ff2d7b, #ffff00, #00ff41);
+    background-size: 400% 400%;
+    animation: ${neonFlicker} 3s ease-in-out infinite;
+    z-index: -1;
+    clip-path: polygon(
+      0 16px, 16px 16px, 16px 0,
+      calc(100% - 16px) 0, calc(100% - 16px) 16px, 100% 16px,
+      100% calc(100% - 16px), calc(100% - 16px) calc(100% - 16px), calc(100% - 16px) 100%,
+      16px 100%, 16px calc(100% - 16px), 0 calc(100% - 16px)
+    );
+    opacity: 0.5;
+    filter: blur(4px);
+  }
+
+  /* 顶部彩虹条 */
+  &::after {
+    content: '';
+    position: absolute;
     top: 0;
-    left: 12px;
-    right: 12px;
+    left: 16px;
+    right: 16px;
     height: 4px;
     background: repeating-linear-gradient(
       90deg,
-      #ff2d7b 0px, #ff2d7b 8px,
-      #00d4ff 8px, #00d4ff 16px,
-      #ffff00 16px, #ffff00 24px,
-      #00ff41 24px, #00ff41 32px
+      #ff2d7b 0px, #ff2d7b 10px,
+      #00d4ff 10px, #00d4ff 20px,
+      #ffff00 20px, #ffff00 30px,
+      #00ff41 30px, #00ff41 40px
     );
   }
 
   @media (max-width: 640px) {
-    padding: 24px 32px;
+    padding: 28px 36px;
   }
 `;
 
@@ -163,18 +176,19 @@ const TerminalHeader = styled.div`
 const TerminalTitleBar = styled.div<{ $locale: Locale }>`
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 20px;
   font-family: ${pixelFont};
   font-size: ${props => getFontSize('xs', props.$locale)};
-  color: var(--text-muted);
+  color: #00ff41;
 `;
 
 const TerminalDot = styled.span<{ $color: string }>`
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   background: ${props => props.$color};
   border-radius: 0;
+  box-shadow: 0 0 10px ${props => props.$color};
 
   /* 像素角 */
   clip-path: polygon(
@@ -185,13 +199,19 @@ const TerminalDot = styled.span<{ $color: string }>`
   );
 `;
 
-// 主标题
+// 主标题 - 霓虹效果
 const Title = styled.h1<{ $locale: Locale }>`
   font-family: ${pixelFont};
   font-size: ${props => getFontSize('2xl', props.$locale)};
-  color: var(--foreground);
-  margin: 0 0 16px;
-  letter-spacing: 4px;
+  color: #fff;
+  margin: 0 0 20px;
+  letter-spacing: 6px;
+  text-shadow: 
+    0 0 10px #00ff41,
+    0 0 20px #00ff41,
+    0 0 40px #00ff41,
+    0 0 80px #00ff41;
+  animation: ${neonFlicker} 3s ease-in-out infinite;
 
   &:hover {
     animation: ${glitch} 0.5s ease-in-out;
@@ -199,7 +219,7 @@ const Title = styled.h1<{ $locale: Locale }>`
   
   @media (max-width: 640px) {
     font-size: ${props => getFontSize('xl', props.$locale)};
-    letter-spacing: 2px;
+    letter-spacing: 3px;
   }
 `;
 
@@ -207,82 +227,121 @@ const Title = styled.h1<{ $locale: Locale }>`
 const Description = styled.p<{ $locale: Locale }>`
   font-family: ${pixelFont};
   font-size: ${props => getFontSize('base', props.$locale)};
-  color: var(--text-secondary);
+  color: #00d4ff;
   margin: 0;
   line-height: ${props => getLineHeight('normal', props.$locale)};
   max-width: 600px;
   margin: 0 auto;
+  text-shadow: 0 0 10px #00d4ff;
 
   &::after {
     content: '_';
-    animation: ${blink} 1s step-end infinite;
+    animation: ${blink} 0.8s step-end infinite;
     margin-left: 4px;
     color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
   }
 `;
 
-// 统计信息
+// 统计信息 - 赛博风格
 const StatsBar = styled.div`
   display: flex;
   justify-content: center;
-  gap: 32px;
+  gap: 24px;
   margin-top: 48px;
   flex-wrap: wrap;
 
   @media (max-width: 640px) {
-    gap: 16px;
+    gap: 12px;
   }
 `;
 
-const StatItem = styled.div<{ $locale: Locale }>`
+const StatItem = styled.div<{ $locale: Locale; $color: string }>`
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(10, 10, 10, 0.8);
+  border: 2px solid ${props => props.$color};
   font-family: ${pixelFont};
   font-size: ${props => getFontSize('xs', props.$locale)};
-  color: var(--text-secondary);
+  color: ${props => props.$color};
+  backdrop-filter: blur(5px);
+  box-shadow: 
+    0 0 10px ${props => props.$color}40,
+    inset 0 0 20px ${props => props.$color}10;
+  transition: all 0.3s ease;
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 6px, 6px 6px, 6px 0,
+    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
   );
 
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 0 20px ${props => props.$color}60,
+      inset 0 0 30px ${props => props.$color}20;
+  }
+
   span {
-    color: #00ff41;
+    color: #fff;
     font-size: ${props => getFontSize('sm', props.$locale)};
+    text-shadow: 0 0 10px ${props => props.$color};
   }
 `;
 
-// 分隔线
+// 分隔线 - 霓虹风格
 const Divider = styled.div<{ $locale: Locale }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin: 48px 0;
-  color: var(--text-muted);
+  gap: 20px;
+  margin: 60px 0;
+  color: #00ff41;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('xs', props.$locale)};
+  font-size: ${props => getFontSize('sm', props.$locale)};
+  text-shadow: 0 0 10px #00ff41;
 
   &::before,
   &::after {
     content: '';
     flex: 1;
-    max-width: 100px;
+    max-width: 150px;
     height: 2px;
-    background: repeating-linear-gradient(
+    background: linear-gradient(
       90deg,
-      var(--card-border) 0px,
-      var(--card-border) 4px,
-      transparent 4px,
-      transparent 8px
+      transparent,
+      #00ff41,
+      #00d4ff,
+      #ff2d7b,
+      transparent
     );
+    box-shadow: 0 0 10px #00ff41;
+  }
+`;
+
+// 装饰性代码行
+const CodeDecor = styled.div<{ $locale: Locale }>`
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: ${pixelFont};
+  font-size: ${props => getFontSize('xs', props.$locale)};
+  color: #00ff41;
+  opacity: 0.5;
+  white-space: nowrap;
+
+  &::before {
+    content: '> LOADING BLOG_DATA.EXE...';
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -308,25 +367,30 @@ export default function BlogPageClient({
 }: BlogPageClientProps) {
   return (
     <PageWrapper>
-      <Scanline />
-      <PixelGrid />
+      {/* 赛博朋克背景 */}
+      <CyberBackground />
       
       {/* 浮动装饰 */}
-      <FloatingDecor $top="20%" $left="5%" $delay={0}>📚</FloatingDecor>
-      <FloatingDecor $top="35%" $right="8%" $delay={1.5}>✏️</FloatingDecor>
-      <FloatingDecor $top="60%" $left="3%" $delay={3}>💡</FloatingDecor>
-      <FloatingDecor $top="75%" $right="5%" $delay={2}>🎯</FloatingDecor>
+      <FloatingDecor $top="15%" $left="3%" $delay={0} $size="4rem">📚</FloatingDecor>
+      <FloatingDecor $top="30%" $right="5%" $delay={1.5} $size="3.5rem">✨</FloatingDecor>
+      <FloatingDecor $top="55%" $left="5%" $delay={3} $size="3rem">💻</FloatingDecor>
+      <FloatingDecor $top="70%" $right="3%" $delay={2} $size="3.5rem">🚀</FloatingDecor>
+      <FloatingDecor $top="85%" $left="8%" $delay={2.5} $size="2.5rem">⚡</FloatingDecor>
       
       <Header navItems={navItems} />
       
       <Container>
         <PageHeader>
+          <CodeDecor $locale={locale} />
+          
           <TerminalHeader>
             <TerminalTitleBar $locale={locale}>
               <TerminalDot $color="#ff5f56" />
               <TerminalDot $color="#ffbd2e" />
               <TerminalDot $color="#27c93f" />
-              <span style={{ marginLeft: '8px' }}>blog.exe</span>
+              <span style={{ marginLeft: '12px', letterSpacing: '2px' }}>
+                {locale === 'zh' ? '博客终端' : 'BLOG.EXE'}
+              </span>
             </TerminalTitleBar>
             
             <Title $locale={locale}>{title}</Title>
@@ -334,19 +398,21 @@ export default function BlogPageClient({
           </TerminalHeader>
 
           <StatsBar>
-            <StatItem $locale={locale}>
+            <StatItem $locale={locale} $color="#00ff41">
               📝 {locale === 'zh' ? '文章' : 'POSTS'}: <span>{posts.length}</span>
             </StatItem>
-            <StatItem $locale={locale}>
+            <StatItem $locale={locale} $color="#00d4ff">
               🏷️ {locale === 'zh' ? '分类' : 'CATEGORIES'}: <span>3</span>
             </StatItem>
-            <StatItem $locale={locale}>
+            <StatItem $locale={locale} $color="#ff2d7b">
               ⚡ {locale === 'zh' ? '状态' : 'STATUS'}: <span>{locale === 'zh' ? '在线' : 'ONLINE'}</span>
             </StatItem>
           </StatsBar>
         </PageHeader>
 
-        <Divider $locale={locale}>◆ {locale === 'zh' ? '文章列表' : 'ENTRIES'} ◆</Divider>
+        <Divider $locale={locale}>
+          ◆ {locale === 'zh' ? '文章列表' : 'ENTRIES'} ◆
+        </Divider>
 
         <BlogList posts={posts} readTimeText={readTimeText} emptyText={emptyText} locale={locale} />
       </Container>

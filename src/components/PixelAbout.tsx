@@ -2,6 +2,7 @@
 
 import styled, { keyframes } from "styled-components";
 import Header from "./Header";
+import StarWarsBackground from "./StarWarsBackground";
 
 // 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
@@ -17,18 +18,27 @@ const blink = keyframes`
   50% { opacity: 0; }
 `;
 
-const scanline = keyframes`
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-`;
-
 const glitch = keyframes`
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+  0%, 100% { 
+    text-shadow: 2px 0 #ff2d7b, -2px 0 #00d4ff;
+    transform: translate(0);
+  }
+  20% { 
+    text-shadow: -2px 0 #ff2d7b, 2px 0 #00d4ff;
+    transform: translate(-2px, 2px);
+  }
+  40% { 
+    text-shadow: 2px 0 #ff2d7b, -2px 0 #00d4ff;
+    transform: translate(2px, -2px);
+  }
+  60% { 
+    text-shadow: -2px 0 #ff2d7b, 2px 0 #00d4ff;
+    transform: translate(-2px, -2px);
+  }
+  80% { 
+    text-shadow: 2px 0 #ff2d7b, -2px 0 #00d4ff;
+    transform: translate(2px, 2px);
+  }
 `;
 
 const fillBar = keyframes`
@@ -41,50 +51,22 @@ const pulse = keyframes`
   50% { transform: scale(1.05); }
 `;
 
-// 样式组件
-const PageWrapper = styled.div`
-  min-height: 100vh;
-  background: var(--background);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.03) 50%);
-    background-size: 100% 4px;
-    pointer-events: none;
-    z-index: 10;
+const hologram = keyframes`
+  0%, 100% { 
+    opacity: 0.9;
+    filter: hue-rotate(0deg);
+  }
+  50% { 
+    opacity: 1;
+    filter: hue-rotate(10deg);
   }
 `;
 
-const Scanline = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  animation: ${scanline} 8s linear infinite;
-  pointer-events: none;
-  z-index: 11;
-`;
-
-const PixelGrid = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: linear-gradient(var(--card-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.3;
-  pointer-events: none;
+// 样式组件
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
 `;
 
 const Container = styled.main`
@@ -96,16 +78,23 @@ const Container = styled.main`
 `;
 
 // 像素装饰
-const PixelDecoration = styled.div`
-  position: absolute;
-  font-size: 24px;
-  opacity: 0.3;
+const PixelDecoration = styled.div<{ $top?: string; $left?: string; $right?: string; $bottom?: string; $delay: number }>`
+  position: fixed;
+  top: ${props => props.$top || 'auto'};
+  left: ${props => props.$left || 'auto'};
+  right: ${props => props.$right || 'auto'};
+  bottom: ${props => props.$bottom || 'auto'};
+  font-size: 2rem;
+  opacity: 0.4;
   animation: ${float} 4s ease-in-out infinite;
+  animation-delay: ${props => props.$delay}s;
+  filter: drop-shadow(0 0 10px currentColor);
+  pointer-events: none;
+  z-index: 2;
 
-  &:nth-child(1) { top: 15%; left: 5%; animation-delay: 0s; }
-  &:nth-child(2) { top: 25%; right: 8%; animation-delay: 1s; }
-  &:nth-child(3) { bottom: 20%; left: 8%; animation-delay: 2s; }
-  &:nth-child(4) { bottom: 30%; right: 5%; animation-delay: 1.5s; }
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 // Hero 区域
@@ -117,9 +106,13 @@ const HeroSection = styled.section`
 const Title = styled.h1`
   font-family: ${pixelFont};
   font-size: 2rem;
-  color: var(--foreground);
+  color: #fff;
   margin-bottom: 16px;
-  text-shadow: 4px 4px 0 #ff2d7b, -2px -2px 0 #00d4ff;
+  text-shadow: 
+    0 0 10px #00ff41,
+    0 0 20px #00ff41,
+    0 0 40px #00ff41,
+    4px 4px 0 #ff2d7b;
   animation: ${glitch} 5s ease-in-out infinite;
 
   @media (max-width: 640px) {
@@ -130,53 +123,71 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   font-family: ${pixelFont};
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: #00d4ff;
   line-height: 2;
+  text-shadow: 0 0 10px #00d4ff;
 
   &::after {
     content: "_";
     animation: ${blink} 1s step-end infinite;
+    color: #00ff41;
   }
 `;
 
-// 卡片通用样式
+// 卡片通用样式 - 全息风格
 const Card = styled.div`
-  background: var(--card-bg);
-  border: 4px solid var(--foreground);
+  background: rgba(10, 10, 30, 0.8);
+  border: 3px solid #00ff41;
   padding: 24px;
   margin-bottom: 32px;
   position: relative;
-  box-shadow: 8px 8px 0 var(--foreground);
+  backdrop-filter: blur(10px);
+  animation: ${hologram} 4s ease-in-out infinite;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 12px, 12px 12px, 12px 0,
+    calc(100% - 12px) 0, calc(100% - 12px) 12px, 100% 12px,
+    100% calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) 100%,
+    12px 100%, 12px calc(100% - 12px), 0 calc(100% - 12px)
+  );
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    border: 2px dashed var(--card-border);
-    pointer-events: none;
+    top: 0;
+    left: 12px;
+    right: 12px;
+    height: 3px;
+    background: linear-gradient(90deg, #ff2d7b, #00d4ff, #ffff00, #00ff41);
+  }
+
+  &:hover {
+    border-color: #00d4ff;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
   }
 `;
 
 const SectionTitle = styled.h2`
   font-family: ${pixelFont};
   font-size: 1rem;
-  color: var(--foreground);
+  color: #00ff41;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 12px;
+  text-shadow: 0 0 10px #00ff41;
 
   &::before {
     content: "◆";
     color: #00d4ff;
+    text-shadow: 0 0 10px #00d4ff;
   }
 
   &::after {
     content: "◆";
     color: #ff2d7b;
+    text-shadow: 0 0 10px #ff2d7b;
   }
 `;
 
@@ -184,7 +195,7 @@ const SectionTitle = styled.h2`
 const BioContent = styled.p<{ $locale: string }>`
   font-family: ${pixelFont};
   font-size: ${props => props.$locale === 'en' ? '0.625rem' : '1rem'};
-  color: var(--text-secondary);
+  color: #aaa;
   line-height: 2.5;
 `;
 
@@ -200,13 +211,22 @@ const TimelineItem = styled.div`
   align-items: center;
   gap: 16px;
   padding: 12px;
-  border: 2px solid var(--card-border);
-  transition: all 0.2s ease;
+  border: 2px solid rgba(0, 255, 65, 0.3);
+  background: rgba(0, 255, 65, 0.05);
+  transition: all 0.3s ease;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 6px, 6px 6px, 6px 0,
+    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+  );
 
   &:hover {
     border-color: #00d4ff;
     transform: translateX(8px);
-    box-shadow: 4px 4px 0 #00d4ff;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
   }
 `;
 
@@ -215,17 +235,19 @@ const TimelineYear = styled.span`
   font-size: 0.75rem;
   color: #00d4ff;
   min-width: 60px;
+  text-shadow: 0 0 10px #00d4ff;
 `;
 
 const TimelineIcon = styled.span`
   font-size: 1.5rem;
   animation: ${pulse} 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px currentColor);
 `;
 
 const TimelineEvent = styled.span`
   font-family: ${pixelFont};
   font-size: 0.625rem;
-  color: var(--text-secondary);
+  color: #aaa;
 `;
 
 // 技能条
@@ -250,29 +272,39 @@ const SkillHeader = styled.div`
 const SkillName = styled.span`
   font-family: ${pixelFont};
   font-size: 0.625rem;
-  color: var(--foreground);
+  color: #fff;
 `;
 
 const SkillLevel = styled.span`
   font-family: ${pixelFont};
   font-size: 0.5rem;
   color: #00d4ff;
+  text-shadow: 0 0 10px #00d4ff;
 `;
 
 const SkillBarBg = styled.div`
   height: 16px;
-  background: var(--card-border);
-  border: 2px solid var(--foreground);
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #00ff41;
   position: relative;
   overflow: hidden;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
 `;
 
 const SkillBarFill = styled.div<{ $level: number }>`
   height: 100%;
-  background: linear-gradient(90deg, #00d4ff, #7b2dff);
+  background: linear-gradient(90deg, #00ff41, #00d4ff, #a78bfa);
   --skill-level: ${props => props.$level}%;
   animation: ${fillBar} 1.5s ease-out forwards;
   position: relative;
+  box-shadow: 0 0 10px #00ff41;
 
   &::after {
     content: "";
@@ -281,7 +313,7 @@ const SkillBarFill = styled.div<{ $level: number }>`
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.1) 50%);
+    background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.2) 50%);
     background-size: 100% 4px;
   }
 `;
@@ -303,24 +335,34 @@ const InterestItem = styled.div`
   align-items: center;
   gap: 8px;
   padding: 16px;
-  border: 2px solid var(--card-border);
-  transition: all 0.2s ease;
+  border: 2px solid rgba(255, 45, 123, 0.3);
+  background: rgba(255, 45, 123, 0.05);
+  transition: all 0.3s ease;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 6px, 6px 6px, 6px 0,
+    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+  );
 
   &:hover {
     border-color: #ff2d7b;
     transform: translateY(-4px);
-    box-shadow: 4px 4px 0 #ff2d7b;
+    box-shadow: 0 0 20px rgba(255, 45, 123, 0.3);
   }
 `;
 
 const InterestIcon = styled.span`
   font-size: 2rem;
+  filter: drop-shadow(0 0 10px currentColor);
 `;
 
 const InterestName = styled.span`
   font-family: ${pixelFont};
   font-size: 0.5rem;
-  color: var(--text-secondary);
+  color: #aaa;
 `;
 
 // 联系方式
@@ -335,15 +377,31 @@ const ContactItem = styled.div`
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border: 2px solid var(--card-border);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  background: rgba(0, 212, 255, 0.05);
   font-family: ${pixelFont};
   font-size: 0.625rem;
-  color: var(--text-secondary);
+  color: #aaa;
+  transition: all 0.3s ease;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
 
   &::before {
     content: "▶";
     color: #00d4ff;
     font-size: 0.5rem;
+    text-shadow: 0 0 10px #00d4ff;
+  }
+
+  &:hover {
+    border-color: #00d4ff;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
   }
 `;
 
@@ -357,10 +415,11 @@ const Footer = styled.footer`
 const FooterText = styled.p`
   font-family: ${pixelFont};
   font-size: 0.5rem;
-  color: var(--text-muted);
+  color: #666;
 
   span {
     color: #ff2d7b;
+    text-shadow: 0 0 10px #ff2d7b;
   }
 `;
 
@@ -373,7 +432,12 @@ const PixelDivider = styled.div`
   span {
     width: 8px;
     height: 8px;
-    background: var(--text-muted);
+
+    &:nth-child(1) { background: #ff2d7b; box-shadow: 0 0 10px #ff2d7b; }
+    &:nth-child(2) { background: #ffff00; box-shadow: 0 0 10px #ffff00; }
+    &:nth-child(3) { background: #00ff41; box-shadow: 0 0 10px #00ff41; }
+    &:nth-child(4) { background: #00d4ff; box-shadow: 0 0 10px #00d4ff; }
+    &:nth-child(5) { background: #a78bfa; box-shadow: 0 0 10px #a78bfa; }
   }
 `;
 
@@ -385,6 +449,35 @@ const TwoColumnGrid = styled.div`
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+  }
+`;
+
+// 霓虹标语
+const NeonBanner = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: ${pixelFont};
+  font-size: 0.5rem;
+  color: #ffff00;
+  padding: 10px 20px;
+  border: 2px solid #ffff00;
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00;
+  z-index: 10;
+
+  /* 像素角 */
+  clip-path: polygon(
+    0 4px, 4px 4px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
+
+  @media (max-width: 768px) {
+    font-size: 0.4rem;
+    padding: 8px 16px;
   }
 `;
 
@@ -448,12 +541,14 @@ export default function PixelAbout({ navItems, locale, translations }: PixelAbou
 
   return (
     <PageWrapper>
-      <Scanline />
-      <PixelGrid />
-      <PixelDecoration>🎮</PixelDecoration>
-      <PixelDecoration>💻</PixelDecoration>
-      <PixelDecoration>⭐</PixelDecoration>
-      <PixelDecoration>🚀</PixelDecoration>
+      {/* 星际大战背景 */}
+      <StarWarsBackground />
+
+      {/* 浮动装饰 */}
+      <PixelDecoration $top="15%" $left="5%" $delay={0}>🛸</PixelDecoration>
+      <PixelDecoration $top="25%" $right="8%" $delay={1}>🌟</PixelDecoration>
+      <PixelDecoration $bottom="20%" $left="8%" $delay={2}>🚀</PixelDecoration>
+      <PixelDecoration $bottom="30%" $right="5%" $delay={1.5}>⭐</PixelDecoration>
 
       <Header navItems={navItems} />
 
@@ -538,7 +633,9 @@ export default function PixelAbout({ navItems, locale, translations }: PixelAbou
           </FooterText>
         </Footer>
       </Container>
+
+      {/* 霓虹标语 */}
+      <NeonBanner>A LONG TIME AGO IN A GALAXY FAR, FAR AWAY...</NeonBanner>
     </PageWrapper>
   );
 }
-
