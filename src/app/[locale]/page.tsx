@@ -1,15 +1,36 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import Header from "@/components/Header";
+import Antigravity from "@/components/Antigravity";
 
 export default async function Home() {
   const t = await getTranslations("common");
+  const headerT = await getTranslations("header");
+  
+  const navItems = [
+    { label: headerT("home"), href: "/" },
+    { label: headerT("blog"), href: "/blog" },
+    { label: headerT("about"), href: "/about" },
+    { label: headerT("contact"), href: "/contact" },
+  ];
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="absolute top-4 right-4">
-          <LanguageSwitcher />
+      <Header navItems={navItems} />
+      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start pt-24">
+        <div style={{ width: "100%", height: "400px", position: "relative" }}>
+          <Antigravity
+            count={300}
+            magnetRadius={6}
+            ringRadius={7}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.5}
+            lerpSpeed={0.05}
+            color={"#FF9FFC"}
+            autoAnimate={true}
+            particleVariance={1}
+          />
         </div>
         <Image
           className="dark:invert"
@@ -70,4 +91,3 @@ export default async function Home() {
     </div>
   );
 }
-

@@ -10,6 +10,19 @@
     "center": "center.",
     "deployNow": "Deploy Now",
     "documentation": "Documentation"
+  },
+  "header": {
+    "home": "Home",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Explore the wonderful world of technology, design and products",
+    "readTime": "min read",
+    "empty": "No posts yet",
+    "backToList": "Back to blog"
   }
 }
 

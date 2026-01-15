@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { defaultLocale } from '../i18n/routing';
+import StyledComponentsRegistry from '../lib/StyledComponentsRegistry';
 import './globals.css';
 
 export default async function RootLayout({
@@ -13,9 +14,11 @@ export default async function RootLayout({
   return (
     <html lang={defaultLocale}>
       <body>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <StyledComponentsRegistry>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );

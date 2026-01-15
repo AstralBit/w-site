@@ -10,6 +10,19 @@
     "center": "中心。",
     "deployNow": "立即部署",
     "documentation": "文档"
+  },
+  "header": {
+    "home": "首页",
+    "blog": "博客",
+    "about": "关于",
+    "contact": "联系我们"
+  },
+  "blog": {
+    "title": "博客",
+    "description": "探索技术、设计与产品的精彩世界",
+    "readTime": "分钟阅读",
+    "empty": "暂无文章",
+    "backToList": "返回博客列表"
   }
 }
 
