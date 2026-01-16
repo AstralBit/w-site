@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { Link } from '../../i18n/routing';
-import { BlogPost } from '@/types/blog';
-import Header from '../Header';
-import StarWarsBackground from '../StarWarsBackground';
-import { Locale } from '@/i18n/routing';
-import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { visit } from 'unist-util-visit';
-import type { Root, Heading } from 'mdast';
+import { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
+import { Link } from "../../i18n/routing";
+import { BlogPost } from "@/types/blog";
+import Header from "../Header";
+import StarWarsBackground from "../StarWarsBackground";
+import { Locale } from "@/i18n/routing";
+import { pixelFont, getFontSize, getLineHeight } from "@/config/fonts";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import { visit } from "unist-util-visit";
+import type { Root, Heading } from "mdast";
 
 // ========== 动画 ==========
 const float = keyframes`
@@ -45,12 +45,13 @@ const pulse = keyframes`
   50% { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
 `;
 
-
 // ========== 样式组件 ==========
 const PageWrapper = styled.div`
   min-height: 100vh;
   position: relative;
   /* 移除 overflow: hidden，否则会阻止 sticky 定位 */
+  /* 添加初始背景色，避免异步加载时的白屏闪烁 */
+  background: radial-gradient(ellipse at center, #0a0a1a 0%, #000005 100%);
 `;
 
 const Container = styled.main`
@@ -76,7 +77,7 @@ const MainContent = styled.div`
 
 const Sidebar = styled.aside<{ $top: number }>`
   position: sticky;
-  top: ${props => props.$top}px;
+  top: ${(props) => props.$top}px;
   align-self: start;
   height: fit-content;
   max-height: calc(100vh - 160px);
@@ -88,13 +89,21 @@ const Sidebar = styled.aside<{ $top: number }>`
   width: 100%;
   min-width: 0;
   transition: top 0.3s ease;
-  
+
   /* 像素角 */
   clip-path: polygon(
-    0 8px, 8px 8px, 8px 0,
-    calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
-    100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
-    8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+    0 8px,
+    8px 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 8px),
+    0 calc(100% - 8px)
   );
 
   /* 滚动条样式 */
@@ -122,7 +131,7 @@ const Sidebar = styled.aside<{ $top: number }>`
 
 const SidebarTitle = styled.div<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${(props) => getFontSize("sm", props.$locale)};
   color: var(--foreground);
   margin-bottom: 16px;
   padding-bottom: 12px;
@@ -132,7 +141,7 @@ const SidebarTitle = styled.div<{ $locale: Locale }>`
   gap: 8px;
 
   &::before {
-    content: '📑';
+    content: "📑";
   }
 `;
 
@@ -142,22 +151,28 @@ const TocList = styled.ul`
   margin: 0;
 `;
 
-const TocItem = styled.li<{ $level: number; $isActive: boolean; $locale: Locale }>`
-  margin: ${props => props.$level === 1 ? '12px 0' : '8px 0'};
-  padding-left: ${props => (props.$level - 1) * 16}px;
-  
+const TocItem = styled.li<{
+  $level: number;
+  $isActive: boolean;
+  $locale: Locale;
+}>`
+  margin: ${(props) => (props.$level === 1 ? "12px 0" : "8px 0")};
+  padding-left: ${(props) => (props.$level - 1) * 16}px;
+
   a {
     display: block;
     font-family: ${pixelFont};
-    font-size: ${props => {
-      if (props.$level === 1) return '0.8rem';
-      if (props.$level === 2) return '0.7rem';
-      return '0.7rem';
+    font-size: ${(props) => {
+      if (props.$level === 1) return "0.8rem";
+      if (props.$level === 2) return "0.7rem";
+      return "0.7rem";
     }};
-    color: ${props => props.$isActive ? '#00ff41' : 'var(--text-secondary)'};
+    color: ${(props) =>
+      props.$isActive ? "#00ff41" : "var(--text-secondary)"};
     text-decoration: none;
     padding: 6px 10px;
-    border-left: 2px solid ${props => props.$isActive ? '#00ff41' : 'transparent'};
+    border-left: 2px solid
+      ${(props) => (props.$isActive ? "#00ff41" : "transparent")};
     transition: all 0.15s ease;
     position: relative;
 
@@ -168,8 +183,8 @@ const TocItem = styled.li<{ $level: number; $isActive: boolean; $locale: Locale 
     }
 
     &::before {
-      content: '▶';
-      display: ${props => props.$isActive ? 'inline' : 'none'};
+      content: "▶";
+      display: ${(props) => (props.$isActive ? "inline" : "none")};
       margin-right: 6px;
       color: #00ff41;
       font-size: 8px;
@@ -183,7 +198,7 @@ const BackButton = styled(Link)<{ $locale: Locale }>`
   align-items: center;
   gap: 10px;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${(props) => getFontSize("sm", props.$locale)};
   color: var(--text-secondary);
   text-decoration: none;
   padding: 10px 16px;
@@ -194,14 +209,22 @@ const BackButton = styled(Link)<{ $locale: Locale }>`
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 
   &::before {
-    content: '◀';
+    content: "◀";
     color: #00ff41;
     font-size: 10px;
   }
@@ -225,40 +248,50 @@ const CoverArea = styled.div<{ $category: string }>`
   overflow: hidden;
   margin-bottom: 40px;
   border: 3px solid var(--foreground);
-  background: ${props => {
+  background: ${(props) => {
     const gradients: Record<string, string> = {
-      tech: 'linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0a192f 100%)',
-      design: 'linear-gradient(135deg, #1a0a1a 0%, #3d1a3d 50%, #2d0a2d 100%)',
-      product: 'linear-gradient(135deg, #1a1a0a 0%, #2d2d1a 50%, #1a1a0a 100%)',
+      tech: "linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0a192f 100%)",
+      design: "linear-gradient(135deg, #1a0a1a 0%, #3d1a3d 50%, #2d0a2d 100%)",
+      product: "linear-gradient(135deg, #1a1a0a 0%, #2d2d1a 50%, #1a1a0a 100%)",
     };
     return gradients[props.$category] || gradients.tech;
   }};
 
   /* 像素角 */
   clip-path: polygon(
-    0 12px, 12px 12px, 12px 0,
-    calc(100% - 12px) 0, calc(100% - 12px) 12px, 100% 12px,
-    100% calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) 100%,
-    12px 100%, 12px calc(100% - 12px), 0 calc(100% - 12px)
+    0 12px,
+    12px 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    calc(100% - 12px) 12px,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    12px calc(100% - 12px),
+    0 calc(100% - 12px)
   );
 
   /* 网格 */
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: 
-      linear-gradient(rgba(0, 255, 65, 0.05) 1px, transparent 1px),
+    background-image: linear-gradient(
+        rgba(0, 255, 65, 0.05) 1px,
+        transparent 1px
+      ),
       linear-gradient(90deg, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
     background-size: 12px 12px;
   }
 
   /* 底部渐变 */
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
@@ -278,19 +311,26 @@ const CoverIcon = styled.div`
   filter: drop-shadow(0 0 30px rgba(0, 255, 65, 0.3));
 `;
 
-const CoverCorner = styled.div<{ $position: 'tl' | 'tr' | 'bl' | 'br'; $locale: Locale }>`
+const CoverCorner = styled.div<{
+  $position: "tl" | "tr" | "bl" | "br";
+  $locale: Locale;
+}>`
   position: absolute;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('xs', props.$locale)};
+  font-size: ${(props) => getFontSize("xs", props.$locale)};
   color: #00ff41;
   opacity: 0.5;
 
-  ${props => {
-    switch(props.$position) {
-      case 'tl': return `top: 16px; left: 16px;`;
-      case 'tr': return `top: 16px; right: 16px;`;
-      case 'bl': return `bottom: 16px; left: 16px;`;
-      case 'br': return `bottom: 16px; right: 16px;`;
+  ${(props) => {
+    switch (props.$position) {
+      case "tl":
+        return `top: 16px; left: 16px;`;
+      case "tr":
+        return `top: 16px; right: 16px;`;
+      case "bl":
+        return `bottom: 16px; left: 16px;`;
+      case "br":
+        return `bottom: 16px; right: 16px;`;
     }
   }}
 `;
@@ -306,10 +346,10 @@ const CategoryBadge = styled.div<{ $color: string; $locale: Locale }>`
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  background: ${props => props.$color};
+  background: ${(props) => props.$color};
   color: #0a0a0a;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${(props) => getFontSize("sm", props.$locale)};
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -317,14 +357,22 @@ const CategoryBadge = styled.div<{ $color: string; $locale: Locale }>`
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 
   &::before {
-    content: '◆';
+    content: "◆";
     font-size: 8px;
   }
 `;
@@ -332,17 +380,17 @@ const CategoryBadge = styled.div<{ $color: string; $locale: Locale }>`
 // 标题
 const Title = styled.h1<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('xl', props.$locale)};
+  font-size: ${(props) => getFontSize("xl", props.$locale)};
   color: var(--foreground);
-  line-height: ${props => getLineHeight('normal', props.$locale)};
+  line-height: ${(props) => getLineHeight("normal", props.$locale)};
   margin-bottom: 24px;
-  
+
   &:hover {
     animation: ${glitch} 0.5s ease-in-out;
   }
 
   @media (max-width: 640px) {
-    font-size: ${props => getFontSize('lg', props.$locale)};
+    font-size: ${(props) => getFontSize("lg", props.$locale)};
   }
 `;
 
@@ -358,10 +406,18 @@ const MetaCard = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 8px, 8px 8px, 8px 0,
-    calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
-    100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
-    8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+    0 8px,
+    8px 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 8px),
+    0 calc(100% - 8px)
   );
 
   @media (max-width: 640px) {
@@ -380,26 +436,38 @@ const AuthorInfo = styled.div`
 const Avatar = styled.div<{ $color: string; $locale: Locale }>`
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, ${props => props.$color} 0%, ${props => props.$color}88 100%);
+  background: linear-gradient(
+    135deg,
+    ${(props) => props.$color} 0%,
+    ${(props) => props.$color}88 100%
+  );
   border: 2px solid var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('md', props.$locale)};
+  font-size: ${(props) => getFontSize("md", props.$locale)};
   color: #fff;
   position: relative;
 
   /* 像素角 */
   clip-path: polygon(
-    0 6px, 6px 6px, 6px 0,
-    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
-    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
-    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+    0 6px,
+    6px 6px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 6px),
+    0 calc(100% - 6px)
   );
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -2px;
     right: -2px;
@@ -418,13 +486,13 @@ const AuthorDetails = styled.div`
 
 const AuthorName = styled.span<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${(props) => getFontSize("sm", props.$locale)};
   color: var(--foreground);
 `;
 
 const PublishDate = styled.span<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('xs', props.$locale)};
+  font-size: ${(props) => getFontSize("xs", props.$locale)};
   color: var(--text-muted);
 `;
 
@@ -444,17 +512,25 @@ const ReadTime = styled.div<{ $locale: Locale }>`
   align-items: center;
   gap: 8px;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${(props) => getFontSize("sm", props.$locale)};
   color: var(--text-secondary);
   padding: 8px 12px;
   background: var(--card-border);
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 
   span {
@@ -472,26 +548,34 @@ const Content = styled.article<{ $locale: Locale }>`
 
   /* 像素角 */
   clip-path: polygon(
-    0 12px, 12px 12px, 12px 0,
-    calc(100% - 12px) 0, calc(100% - 12px) 12px, 100% 12px,
-    100% calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) 100%,
-    12px 100%, 12px calc(100% - 12px), 0 calc(100% - 12px)
+    0 12px,
+    12px 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    calc(100% - 12px) 12px,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    12px calc(100% - 12px),
+    0 calc(100% - 12px)
   );
 
   /* 顶部装饰 */
   &::before {
-    content: '// CONTENT START';
+    content: "// CONTENT START";
     position: absolute;
     top: 12px;
     left: 24px;
     font-family: ${pixelFont};
-    font-size: ${props => getFontSize('xs', props.$locale)};
+    font-size: ${(props) => getFontSize("xs", props.$locale)};
     color: var(--text-muted);
   }
 
   /* 行号装饰 */
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 40px;
     left: 0;
@@ -514,30 +598,42 @@ const ContentInner = styled.div<{ $locale: Locale }>`
   position: relative;
   padding-left: 20px;
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: var(--foreground);
     margin: 2.5em 0 1em;
     font-weight: bold;
-    line-height: ${props => getLineHeight('normal', props.$locale)};
+    line-height: ${(props) => getLineHeight("normal", props.$locale)};
     position: relative;
     scroll-margin-top: 100px;
 
     &::before {
-      content: '#';
+      content: "#";
       color: #ff2d7b;
       margin-right: 8px;
     }
   }
 
-  h1 { font-size: 2rem }
-  h2 { font-size: 1.5rem }
-  h3 { font-size: 1.25rem }
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
 
   p {
     margin: 1.5em 0;
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin: 1.5em 0;
     padding-left: 1.5em;
   }
@@ -560,10 +656,18 @@ const ContentInner = styled.div<{ $locale: Locale }>`
 
     /* 像素角 */
     clip-path: polygon(
-      0 2px, 2px 2px, 2px 0,
-      calc(100% - 2px) 0, calc(100% - 2px) 2px, 100% 2px,
-      100% calc(100% - 2px), calc(100% - 2px) calc(100% - 2px), calc(100% - 2px) 100%,
-      2px 100%, 2px calc(100% - 2px), 0 calc(100% - 2px)
+      0 2px,
+      2px 2px,
+      2px 0,
+      calc(100% - 2px) 0,
+      calc(100% - 2px) 2px,
+      100% 2px,
+      100% calc(100% - 2px),
+      calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 2px) 100%,
+      2px 100%,
+      2px calc(100% - 2px),
+      0 calc(100% - 2px)
     );
   }
 
@@ -577,18 +681,26 @@ const ContentInner = styled.div<{ $locale: Locale }>`
 
     /* 像素角 */
     clip-path: polygon(
-      0 8px, 8px 8px, 8px 0,
-      calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
-      100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
-      8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+      0 8px,
+      8px 8px,
+      8px 0,
+      calc(100% - 8px) 0,
+      calc(100% - 8px) 8px,
+      100% 8px,
+      100% calc(100% - 8px),
+      calc(100% - 8px) calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      8px 100%,
+      8px calc(100% - 8px),
+      0 calc(100% - 8px)
     );
 
     &::before {
-      content: '> CODE';
+      content: "> CODE";
       position: absolute;
       top: 8px;
       right: 12px;
-      font-size: ${props => getFontSize('xs', props.$locale)};
+      font-size: ${(props) => getFontSize("xs", props.$locale)};
       color: #00ff41;
       opacity: 0.5;
     }
@@ -609,7 +721,7 @@ const ContentInner = styled.div<{ $locale: Locale }>`
     position: relative;
 
     &::before {
-      content: '💬';
+      content: "💬";
       position: absolute;
       top: -12px;
       left: 16px;
@@ -637,7 +749,7 @@ const TagsSection = styled.div`
 
 const TagsTitle = styled.div<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${(props) => getFontSize("sm", props.$locale)};
   color: var(--text-muted);
   margin-bottom: 16px;
   display: flex;
@@ -645,7 +757,7 @@ const TagsTitle = styled.div<{ $locale: Locale }>`
   gap: 8px;
 
   &::before {
-    content: '🏷️';
+    content: "🏷️";
   }
 `;
 
@@ -657,7 +769,7 @@ const TagsGrid = styled.div`
 
 const Tag = styled.span<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('md', props.$locale)};
+  font-size: ${(props) => getFontSize("md", props.$locale)};
   padding: 8px 14px;
   background: var(--card-bg);
   color: #00d4ff;
@@ -667,10 +779,18 @@ const Tag = styled.span<{ $locale: Locale }>`
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 
   &:hover {
@@ -680,7 +800,7 @@ const Tag = styled.span<{ $locale: Locale }>`
   }
 
   &::before {
-    content: '#';
+    content: "#";
     opacity: 0.6;
   }
 `;
@@ -695,7 +815,7 @@ const EndMark = styled.div`
 
 const EndText = styled.div<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${(props) => getFontSize("sm", props.$locale)};
   color: var(--text-muted);
   display: flex;
   align-items: center;
@@ -718,35 +838,45 @@ const EndDecor = styled.div`
     width: 8px;
     height: 8px;
 
-    &:nth-child(1) { background: #ff2d7b; }
-    &:nth-child(2) { background: #ffff00; }
-    &:nth-child(3) { background: #00ff41; }
-    &:nth-child(4) { background: #00d4ff; }
-    &:nth-child(5) { background: #a78bfa; }
+    &:nth-child(1) {
+      background: #ff2d7b;
+    }
+    &:nth-child(2) {
+      background: #ffff00;
+    }
+    &:nth-child(3) {
+      background: #00ff41;
+    }
+    &:nth-child(4) {
+      background: #00d4ff;
+    }
+    &:nth-child(5) {
+      background: #a78bfa;
+    }
   }
 `;
 
 // ========== 辅助函数 ==========
 const getCategoryColor = (category: string): string => {
   const colors: Record<string, string> = {
-    tech: '#00ff41',
-    design: '#ff2d7b',
-    product: '#ffff00',
+    tech: "#00ff41",
+    design: "#ff2d7b",
+    product: "#ffff00",
   };
   return colors[category] || colors.tech;
 };
 
 const getCategoryIcon = (category: string): string => {
   const icons: Record<string, string> = {
-    tech: '💻',
-    design: '🎨',
-    product: '🚀',
+    tech: "💻",
+    design: "🎨",
+    product: "🚀",
   };
-  return icons[category] || '📝';
+  return icons[category] || "📝";
 };
 
 const getAvatarColor = (name: string): string => {
-  const colors = ['#00d4ff', '#ff2d7b', '#ffff00', '#00ff41', '#a78bfa'];
+  const colors = ["#00d4ff", "#ff2d7b", "#ffff00", "#00ff41", "#a78bfa"];
   const index = name.charCodeAt(0) % colors.length;
   return colors[index];
 };
@@ -771,19 +901,19 @@ interface TocItem {
 const generateId = (text: string): string => {
   return text
     .toLowerCase()
-    .replace(/[^\u4e00-\u9fa5a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[^\u4e00-\u9fa5a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 };
 
 // 解析 Markdown 提取标题
 const extractHeadings = (content: string): TocItem[] => {
   const headings: TocItem[] = [];
   if (!content) {
-    console.log('extractHeadings: content is empty');
+    console.log("extractHeadings: content is empty");
     return headings;
   }
-  
-  const lines = content.split('\n');
+
+  const lines = content.split("\n");
 
   lines.forEach((line) => {
     // 匹配 Markdown 标题格式：## 标题 或 # 标题
@@ -793,25 +923,25 @@ const extractHeadings = (content: string): TocItem[] => {
       const level = match[1].length;
       const text = match[2].trim();
       // 移除标题中的 Markdown 链接格式 [text](url)
-      const cleanText = text.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+      const cleanText = text.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1");
       const id = generateId(cleanText);
       headings.push({ id, text: cleanText, level });
     }
   });
-  
+
   return headings;
 };
 
 const TOP_OFFSET = 820;
 
-export default function BlogDetailClient({ 
-  post, 
+export default function BlogDetailClient({
+  post,
   readTimeText,
   backText,
   navItems,
-  locale
+  locale,
 }: BlogDetailClientProps) {
-  const [activeId, setActiveId] = useState<string>('');
+  const [activeId, setActiveId] = useState<string>("");
   const [headings, setHeadings] = useState<TocItem[]>([]);
   const [sidebarTop, setSidebarTop] = useState<number>(TOP_OFFSET);
 
@@ -824,18 +954,20 @@ export default function BlogDetailClient({
     } else {
       // 如果从内容中提取失败，等待 DOM 渲染后从 DOM 中提取
       const timer = setTimeout(() => {
-        const domHeadings = document.querySelectorAll('article h1, article h2, article h3, article h4, article h5, article h6');
-        
+        const domHeadings = document.querySelectorAll(
+          "article h1, article h2, article h3, article h4, article h5, article h6"
+        );
+
         if (domHeadings.length > 0) {
           const extractedFromDom: TocItem[] = [];
           domHeadings.forEach((heading) => {
             const level = parseInt(heading.tagName.charAt(1));
-            const text = heading.textContent?.trim() || '';
+            const text = heading.textContent?.trim() || "";
             // 移除 # 符号（如果存在）
-            const cleanText = text.replace(/^#+\s*/, '').trim();
+            const cleanText = text.replace(/^#+\s*/, "").trim();
             const id = heading.id || generateId(cleanText);
-            
-            if (cleanText && !extractedFromDom.find(h => h.id === id)) {
+
+            if (cleanText && !extractedFromDom.find((h) => h.id === id)) {
               extractedFromDom.push({ id, text: cleanText, level });
             }
           });
@@ -854,7 +986,7 @@ export default function BlogDetailClient({
 
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      
+
       // 当滚动超过 680px 时，将侧边栏 top 从 800px 改为 120px
       // 680 = 800 - 120，这样在滚动到 680px 时，侧边栏刚好到达 120px 位置
       if (scrollPosition >= 680) {
@@ -862,10 +994,10 @@ export default function BlogDetailClient({
       } else {
         setSidebarTop(TOP_OFFSET);
       }
-      
+
       // 找到当前应该高亮的标题
       const scrollPositionForHeading = scrollPosition + 150;
-      let current = '';
+      let current = "";
       for (let i = headings.length - 1; i >= 0; i--) {
         const element = document.getElementById(headings[i].id);
         if (element && element.offsetTop <= scrollPositionForHeading) {
@@ -873,43 +1005,48 @@ export default function BlogDetailClient({
           break;
         }
       }
-      
-      setActiveId(current || headings[0]?.id || '');
+
+      setActiveId(current || headings[0]?.id || "");
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     handleScroll(); // 初始调用
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [headings]);
 
   // 为标题添加 ID 的 rehype 插件
   const rehypeSlug = () => {
     return (tree: Root) => {
-      visit(tree, 'heading', (node: Heading) => {
+      visit(tree, "heading", (node: Heading) => {
         if (node.children && node.children.length > 0) {
           const text = node.children
-            .filter((child) => child.type === 'text')
-            .map((child) => 'value' in child ? child.value : '')
-            .join('');
+            .filter((child) => child.type === "text")
+            .map((child) => ("value" in child ? child.value : ""))
+            .join("");
           const id = generateId(text);
           node.data = node.data || {};
           (node.data as { id?: string; hProperties?: { id: string } }).id = id;
-          (node.data as { id?: string; hProperties?: { id: string } }).hProperties = { id };
+          (
+            node.data as { id?: string; hProperties?: { id: string } }
+          ).hProperties = { id };
         }
       });
     };
   };
 
   // 点击跳转到标题
-  const handleTocClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const handleTocClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    id: string
+  ) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
       const offsetTop = element.offsetTop - 100;
       window.scrollTo({
         top: offsetTop,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -918,48 +1055,62 @@ export default function BlogDetailClient({
     <PageWrapper>
       {/* 星际大战背景 */}
       <StarWarsBackground />
-      
+
       <Header navItems={navItems} />
-      
+
       <Container>
         <MainContent>
           <BackButton href="/blog" $locale={locale}>
             {backText}
           </BackButton>
 
-        <CoverArea $category={post.category}>
-          <CoverCorner $position="tl" $locale={locale}>┌ FILE: {post.slug}</CoverCorner>
-          <CoverCorner $position="tr" $locale={locale}>v1.0 ┐</CoverCorner>
-          <CoverCorner $position="bl" $locale={locale}>└ {post.category.toUpperCase()}</CoverCorner>
-          <CoverCorner $position="br" $locale={locale}>READY ┘</CoverCorner>
-          <CoverIcon>{getCategoryIcon(post.category)}</CoverIcon>
-        </CoverArea>
+          <CoverArea $category={post.category}>
+            <CoverCorner $position="tl" $locale={locale}>
+              ┌ FILE: {post.slug}
+            </CoverCorner>
+            <CoverCorner $position="tr" $locale={locale}>
+              v1.0 ┐
+            </CoverCorner>
+            <CoverCorner $position="bl" $locale={locale}>
+              └ {post.category.toUpperCase()}
+            </CoverCorner>
+            <CoverCorner $position="br" $locale={locale}>
+              READY ┘
+            </CoverCorner>
+            <CoverIcon>{getCategoryIcon(post.category)}</CoverIcon>
+          </CoverArea>
 
-        <ArticleHeader>
-          <CategoryBadge $color={getCategoryColor(post.category)} $locale={locale}>
-            {post.category}
-          </CategoryBadge>
+          <ArticleHeader>
+            <CategoryBadge
+              $color={getCategoryColor(post.category)}
+              $locale={locale}
+            >
+              {post.category}
+            </CategoryBadge>
 
-          <Title $locale={locale}>{post.title}</Title>
+            <Title $locale={locale}>{post.title}</Title>
 
-          <MetaCard>
-            <AuthorInfo>
-              <Avatar $color={getAvatarColor(post.author.name)} $locale={locale}>
-                {post.author.name.charAt(0)}
-              </Avatar>
-              <AuthorDetails>
-                <AuthorName $locale={locale}>{post.author.name}</AuthorName>
-                <PublishDate $locale={locale}>{post.publishedAt}</PublishDate>
-              </AuthorDetails>
-            </AuthorInfo>
+            <MetaCard>
+              <AuthorInfo>
+                <Avatar
+                  $color={getAvatarColor(post.author.name)}
+                  $locale={locale}
+                >
+                  {post.author.name.charAt(0)}
+                </Avatar>
+                <AuthorDetails>
+                  <AuthorName $locale={locale}>{post.author.name}</AuthorName>
+                  <PublishDate $locale={locale}>{post.publishedAt}</PublishDate>
+                </AuthorDetails>
+              </AuthorInfo>
 
-            <MetaDivider />
+              <MetaDivider />
 
-            <ReadTime $locale={locale}>
-              ⏱ <span>{post.readingTime}</span> {readTimeText}
-            </ReadTime>
-          </MetaCard>
-        </ArticleHeader>
+              <ReadTime $locale={locale}>
+                ⏱ <span>{post.readingTime}</span> {readTimeText}
+              </ReadTime>
+            </MetaCard>
+          </ArticleHeader>
 
           <Content $locale={locale}>
             <ContentInner $locale={locale}>
@@ -968,46 +1119,94 @@ export default function BlogDetailClient({
                 rehypePlugins={[rehypeRaw, rehypeSlug]}
                 components={{
                   h1: ({ node, children, ...props }) => {
-                    const textContent = Array.isArray(children) 
-                      ? children.map(c => typeof c === 'string' ? c : '').join('')
-                      : String(children || '');
-                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
-                    return <h1 id={id} {...props}>{children}</h1>;
+                    const textContent = Array.isArray(children)
+                      ? children
+                          .map((c) => (typeof c === "string" ? c : ""))
+                          .join("")
+                      : String(children || "");
+                    const id =
+                      (node?.data as { id?: string })?.id ||
+                      generateId(textContent);
+                    return (
+                      <h1 id={id} {...props}>
+                        {children}
+                      </h1>
+                    );
                   },
                   h2: ({ node, children, ...props }) => {
-                    const textContent = Array.isArray(children) 
-                      ? children.map(c => typeof c === 'string' ? c : '').join('')
-                      : String(children || '');
-                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
-                    return <h2 id={id} {...props}>{children}</h2>;
+                    const textContent = Array.isArray(children)
+                      ? children
+                          .map((c) => (typeof c === "string" ? c : ""))
+                          .join("")
+                      : String(children || "");
+                    const id =
+                      (node?.data as { id?: string })?.id ||
+                      generateId(textContent);
+                    return (
+                      <h2 id={id} {...props}>
+                        {children}
+                      </h2>
+                    );
                   },
                   h3: ({ node, children, ...props }) => {
-                    const textContent = Array.isArray(children) 
-                      ? children.map(c => typeof c === 'string' ? c : '').join('')
-                      : String(children || '');
-                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
-                    return <h3 id={id} {...props}>{children}</h3>;
+                    const textContent = Array.isArray(children)
+                      ? children
+                          .map((c) => (typeof c === "string" ? c : ""))
+                          .join("")
+                      : String(children || "");
+                    const id =
+                      (node?.data as { id?: string })?.id ||
+                      generateId(textContent);
+                    return (
+                      <h3 id={id} {...props}>
+                        {children}
+                      </h3>
+                    );
                   },
                   h4: ({ node, children, ...props }) => {
-                    const textContent = Array.isArray(children) 
-                      ? children.map(c => typeof c === 'string' ? c : '').join('')
-                      : String(children || '');
-                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
-                    return <h4 id={id} {...props}>{children}</h4>;
+                    const textContent = Array.isArray(children)
+                      ? children
+                          .map((c) => (typeof c === "string" ? c : ""))
+                          .join("")
+                      : String(children || "");
+                    const id =
+                      (node?.data as { id?: string })?.id ||
+                      generateId(textContent);
+                    return (
+                      <h4 id={id} {...props}>
+                        {children}
+                      </h4>
+                    );
                   },
                   h5: ({ node, children, ...props }) => {
-                    const textContent = Array.isArray(children) 
-                      ? children.map(c => typeof c === 'string' ? c : '').join('')
-                      : String(children || '');
-                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
-                    return <h5 id={id} {...props}>{children}</h5>;
+                    const textContent = Array.isArray(children)
+                      ? children
+                          .map((c) => (typeof c === "string" ? c : ""))
+                          .join("")
+                      : String(children || "");
+                    const id =
+                      (node?.data as { id?: string })?.id ||
+                      generateId(textContent);
+                    return (
+                      <h5 id={id} {...props}>
+                        {children}
+                      </h5>
+                    );
                   },
                   h6: ({ node, children, ...props }) => {
-                    const textContent = Array.isArray(children) 
-                      ? children.map(c => typeof c === 'string' ? c : '').join('')
-                      : String(children || '');
-                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
-                    return <h6 id={id} {...props}>{children}</h6>;
+                    const textContent = Array.isArray(children)
+                      ? children
+                          .map((c) => (typeof c === "string" ? c : ""))
+                          .join("")
+                      : String(children || "");
+                    const id =
+                      (node?.data as { id?: string })?.id ||
+                      generateId(textContent);
+                    return (
+                      <h6 id={id} {...props}>
+                        {children}
+                      </h6>
+                    );
                   },
                 }}
               >
@@ -1017,20 +1216,28 @@ export default function BlogDetailClient({
           </Content>
 
           <TagsSection>
-            <TagsTitle $locale={locale}>{locale === 'zh' ? '标签' : 'TAGS'}</TagsTitle>
+            <TagsTitle $locale={locale}>
+              {locale === "zh" ? "标签" : "TAGS"}
+            </TagsTitle>
             <TagsGrid>
-              {post.tags.map(tag => (
-                <Tag key={tag} $locale={locale}>{tag}</Tag>
+              {post.tags.map((tag) => (
+                <Tag key={tag} $locale={locale}>
+                  {tag}
+                </Tag>
               ))}
             </TagsGrid>
           </TagsSection>
 
           <EndMark>
             <EndText $locale={locale}>
-              ◆ {locale === 'zh' ? '文章结束' : 'END OF FILE'} <span>_</span> ◆
+              ◆ {locale === "zh" ? "文章结束" : "END OF FILE"} <span>_</span> ◆
             </EndText>
             <EndDecor>
-              <div /><div /><div /><div /><div />
+              <div />
+              <div />
+              <div />
+              <div />
+              <div />
             </EndDecor>
           </EndMark>
         </MainContent>
@@ -1038,7 +1245,7 @@ export default function BlogDetailClient({
         {headings.length > 0 ? (
           <Sidebar $top={sidebarTop}>
             <SidebarTitle $locale={locale}>
-              {locale === 'zh' ? '目录' : 'TABLE OF CONTENTS'}
+              {locale === "zh" ? "目录" : "TABLE OF CONTENTS"}
             </SidebarTitle>
             <TocList>
               {headings.map((heading) => (

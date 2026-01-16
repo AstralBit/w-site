@@ -1,17 +1,16 @@
-'use client';
+"use client";
 
-import styled, { keyframes } from 'styled-components';
-import { BlogPost } from '@/types/blog';
-import BlogList from './BlogList';
-import dynamic from 'next/dynamic';
-import { Locale } from '@/i18n/routing';
-import Header from '../Header';
-import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
+import styled, { keyframes } from "styled-components";
+import { BlogPost } from "@/types/blog";
+import BlogList from "./BlogList";
+import dynamic from "next/dynamic";
+import { Locale } from "@/i18n/routing";
+import Header from "../Header";
+import { pixelFont, getFontSize, getLineHeight } from "@/config/fonts";
 
 const StarWarsBackground = dynamic(() => import("../StarWarsBackground"), {
   ssr: false,
 });
-
 
 // ========== 动画 ==========
 const glitch = keyframes`
@@ -73,18 +72,26 @@ const PageWrapper = styled.div`
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  /* 添加初始背景色，避免异步加载时的白屏闪烁 */
+  background: radial-gradient(ellipse at center, #0a0a1a 0%, #000005 100%);
 `;
 
 // 浮动装饰 - 更大更明显
-const FloatingDecor = styled.div<{ $top: string; $left?: string; $right?: string; $delay: number; $size?: string }>`
+const FloatingDecor = styled.div<{
+  $top: string;
+  $left?: string;
+  $right?: string;
+  $delay: number;
+  $size?: string;
+}>`
   position: fixed;
-  top: ${props => props.$top};
-  left: ${props => props.$left || 'auto'};
-  right: ${props => props.$right || 'auto'};
-  font-size: ${props => props.$size || '3rem'};
+  top: ${(props) => props.$top};
+  left: ${(props) => props.$left || "auto"};
+  right: ${(props) => props.$right || "auto"};
+  font-size: ${(props) => props.$size || "3rem"};
   opacity: 0.2;
   animation: ${float} 8s ease-in-out infinite;
-  animation-delay: ${props => props.$delay}s;
+  animation-delay: ${(props) => props.$delay}s;
   pointer-events: none;
   z-index: 1;
   filter: drop-shadow(0 0 10px currentColor);
@@ -123,15 +130,23 @@ const TerminalHeader = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 16px, 16px 16px, 16px 0,
-    calc(100% - 16px) 0, calc(100% - 16px) 16px, 100% 16px,
-    100% calc(100% - 16px), calc(100% - 16px) calc(100% - 16px), calc(100% - 16px) 100%,
-    16px 100%, 16px calc(100% - 16px), 0 calc(100% - 16px)
+    0 16px,
+    16px 16px,
+    16px 0,
+    calc(100% - 16px) 0,
+    calc(100% - 16px) 16px,
+    100% 16px,
+    100% calc(100% - 16px),
+    calc(100% - 16px) calc(100% - 16px),
+    calc(100% - 16px) 100%,
+    16px 100%,
+    16px calc(100% - 16px),
+    0 calc(100% - 16px)
   );
 
   /* 霓虹边框效果 */
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -3px;
     left: -3px;
@@ -141,10 +156,18 @@ const TerminalHeader = styled.div`
     animation: ${neonFlicker} 3s ease-in-out infinite;
     z-index: -1;
     clip-path: polygon(
-      0 16px, 16px 16px, 16px 0,
-      calc(100% - 16px) 0, calc(100% - 16px) 16px, 100% 16px,
-      100% calc(100% - 16px), calc(100% - 16px) calc(100% - 16px), calc(100% - 16px) 100%,
-      16px 100%, 16px calc(100% - 16px), 0 calc(100% - 16px)
+      0 16px,
+      16px 16px,
+      16px 0,
+      calc(100% - 16px) 0,
+      calc(100% - 16px) 16px,
+      100% 16px,
+      100% calc(100% - 16px),
+      calc(100% - 16px) calc(100% - 16px),
+      calc(100% - 16px) 100%,
+      16px 100%,
+      16px calc(100% - 16px),
+      0 calc(100% - 16px)
     );
     opacity: 0.5;
     filter: blur(4px);
@@ -152,7 +175,7 @@ const TerminalHeader = styled.div`
 
   /* 顶部彩虹条 */
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 16px;
@@ -160,10 +183,14 @@ const TerminalHeader = styled.div`
     height: 4px;
     background: repeating-linear-gradient(
       90deg,
-      #ff2d7b 0px, #ff2d7b 10px,
-      #00d4ff 10px, #00d4ff 20px,
-      #ffff00 20px, #ffff00 30px,
-      #00ff41 30px, #00ff41 40px
+      #ff2d7b 0px,
+      #ff2d7b 10px,
+      #00d4ff 10px,
+      #00d4ff 20px,
+      #ffff00 20px,
+      #ffff00 30px,
+      #00ff41 30px,
+      #00ff41 40px
     );
   }
 
@@ -179,46 +206,51 @@ const TerminalTitleBar = styled.div<{ $locale: Locale }>`
   gap: 10px;
   margin-bottom: 20px;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('xs', props.$locale)};
+  font-size: ${(props) => getFontSize("xs", props.$locale)};
   color: #00ff41;
 `;
 
 const TerminalDot = styled.span<{ $color: string }>`
   width: 12px;
   height: 12px;
-  background: ${props => props.$color};
+  background: ${(props) => props.$color};
   border-radius: 0;
-  box-shadow: 0 0 10px ${props => props.$color};
+  box-shadow: 0 0 10px ${(props) => props.$color};
 
   /* 像素角 */
   clip-path: polygon(
-    0 3px, 3px 3px, 3px 0,
-    calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px,
-    100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%,
-    3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px)
+    0 3px,
+    3px 3px,
+    3px 0,
+    calc(100% - 3px) 0,
+    calc(100% - 3px) 3px,
+    100% 3px,
+    100% calc(100% - 3px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 3px) 100%,
+    3px 100%,
+    3px calc(100% - 3px),
+    0 calc(100% - 3px)
   );
 `;
 
 // 主标题 - 霓虹效果
 const Title = styled.h1<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('2xl', props.$locale)};
+  font-size: ${(props) => getFontSize("2xl", props.$locale)};
   color: #fff;
   margin: 0 0 20px;
   letter-spacing: 6px;
-  text-shadow: 
-    0 0 10px #00ff41,
-    0 0 20px #00ff41,
-    0 0 40px #00ff41,
+  text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 40px #00ff41,
     0 0 80px #00ff41;
   animation: ${neonFlicker} 3s ease-in-out infinite;
 
   &:hover {
     animation: ${glitch} 0.5s ease-in-out;
   }
-  
+
   @media (max-width: 640px) {
-    font-size: ${props => getFontSize('xl', props.$locale)};
+    font-size: ${(props) => getFontSize("xl", props.$locale)};
     letter-spacing: 3px;
   }
 `;
@@ -226,16 +258,16 @@ const Title = styled.h1<{ $locale: Locale }>`
 // 副标题/描述
 const Description = styled.p<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('base', props.$locale)};
+  font-size: ${(props) => getFontSize("base", props.$locale)};
   color: #00d4ff;
   margin: 0;
-  line-height: ${props => getLineHeight('normal', props.$locale)};
+  line-height: ${(props) => getLineHeight("normal", props.$locale)};
   max-width: 600px;
   margin: 0 auto;
   text-shadow: 0 0 10px #00d4ff;
 
   &::after {
-    content: '_';
+    content: "_";
     animation: ${blink} 0.8s step-end infinite;
     margin-left: 4px;
     color: #00ff41;
@@ -262,35 +294,41 @@ const StatItem = styled.div<{ $locale: Locale; $color: string }>`
   gap: 10px;
   padding: 12px 20px;
   background: rgba(10, 10, 10, 0.8);
-  border: 2px solid ${props => props.$color};
+  border: 2px solid ${(props) => props.$color};
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('md', props.$locale)};
-  color: ${props => props.$color};
+  font-size: ${(props) => getFontSize("md", props.$locale)};
+  color: ${(props) => props.$color};
   backdrop-filter: blur(5px);
-  box-shadow: 
-    0 0 10px ${props => props.$color}40,
-    inset 0 0 20px ${props => props.$color}10;
+  box-shadow: 0 0 10px ${(props) => props.$color}40,
+    inset 0 0 20px ${(props) => props.$color}10;
   transition: all 0.3s ease;
 
   /* 像素角 */
   clip-path: polygon(
-    0 6px, 6px 6px, 6px 0,
-    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
-    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
-    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+    0 6px,
+    6px 6px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 6px),
+    0 calc(100% - 6px)
   );
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 
-      0 0 20px ${props => props.$color}60,
-      inset 0 0 30px ${props => props.$color}20;
+    box-shadow: 0 0 20px ${(props) => props.$color}60,
+      inset 0 0 30px ${(props) => props.$color}20;
   }
 
   span {
     color: #fff;
-    font-size: ${props => getFontSize('sm', props.$locale)};
-    text-shadow: 0 0 10px ${props => props.$color};
+    font-size: ${(props) => getFontSize("sm", props.$locale)};
+    text-shadow: 0 0 10px ${(props) => props.$color};
   }
 `;
 
@@ -303,12 +341,12 @@ const Divider = styled.div<{ $locale: Locale }>`
   margin: 60px 0;
   color: #00ff41;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('md', props.$locale)};
+  font-size: ${(props) => getFontSize("md", props.$locale)};
   text-shadow: 0 0 10px #00ff41;
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     flex: 1;
     max-width: 150px;
     height: 2px;
@@ -331,13 +369,13 @@ const CodeDecor = styled.div<{ $locale: Locale }>`
   left: 50%;
   transform: translateX(-50%);
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('xs', props.$locale)};
+  font-size: ${(props) => getFontSize("xs", props.$locale)};
   color: #00ff41;
   opacity: 0.5;
   white-space: nowrap;
 
   &::before {
-    content: '> LOADING BLOG_DATA.EXE...';
+    content: "> LOADING BLOG_DATA.EXE...";
   }
 
   @media (max-width: 768px) {
@@ -356,65 +394,82 @@ interface BlogPageClientProps {
   locale: Locale;
 }
 
-export default function BlogPageClient({ 
-  title, 
-  description, 
-  posts, 
+export default function BlogPageClient({
+  title,
+  description,
+  posts,
   readTimeText,
   emptyText,
   navItems,
-  locale
+  locale,
 }: BlogPageClientProps) {
   return (
     <PageWrapper>
       {/* 星际大战背景 */}
       <StarWarsBackground />
-      
+
       {/* 浮动装饰 */}
-      <FloatingDecor $top="15%" $left="3%" $delay={0} $size="4rem">📚</FloatingDecor>
-      <FloatingDecor $top="30%" $right="5%" $delay={1.5} $size="3.5rem">✨</FloatingDecor>
-      <FloatingDecor $top="55%" $left="5%" $delay={3} $size="3rem">💻</FloatingDecor>
-      <FloatingDecor $top="70%" $right="3%" $delay={2} $size="3.5rem">🚀</FloatingDecor>
-      <FloatingDecor $top="85%" $left="8%" $delay={2.5} $size="2.5rem">⚡</FloatingDecor>
-      
+      <FloatingDecor $top="15%" $left="3%" $delay={0} $size="4rem">
+        📚
+      </FloatingDecor>
+      <FloatingDecor $top="30%" $right="5%" $delay={1.5} $size="3.5rem">
+        ✨
+      </FloatingDecor>
+      <FloatingDecor $top="55%" $left="5%" $delay={3} $size="3rem">
+        💻
+      </FloatingDecor>
+      <FloatingDecor $top="70%" $right="3%" $delay={2} $size="3.5rem">
+        🚀
+      </FloatingDecor>
+      <FloatingDecor $top="85%" $left="8%" $delay={2.5} $size="2.5rem">
+        ⚡
+      </FloatingDecor>
+
       <Header navItems={navItems} />
-      
+
       <Container>
         <PageHeader>
           <CodeDecor $locale={locale} />
-          
+
           <TerminalHeader>
             <TerminalTitleBar $locale={locale}>
               <TerminalDot $color="#ff5f56" />
               <TerminalDot $color="#ffbd2e" />
               <TerminalDot $color="#27c93f" />
-              <span style={{ marginLeft: '12px', letterSpacing: '2px' }}>
-                {locale === 'zh' ? '博客终端' : 'BLOG.EXE'}
+              <span style={{ marginLeft: "12px", letterSpacing: "2px" }}>
+                {locale === "zh" ? "博客终端" : "BLOG.EXE"}
               </span>
             </TerminalTitleBar>
-            
+
             <Title $locale={locale}>{title}</Title>
             <Description $locale={locale}>{description}</Description>
           </TerminalHeader>
 
           <StatsBar>
             <StatItem $locale={locale} $color="#00ff41">
-              📝 {locale === 'zh' ? '文章' : 'POSTS'}: <span>{posts.length}</span>
+              📝 {locale === "zh" ? "文章" : "POSTS"}:{" "}
+              <span>{posts.length}</span>
             </StatItem>
             <StatItem $locale={locale} $color="#00d4ff">
-              🏷️ {locale === 'zh' ? '分类' : 'CATEGORIES'}: <span>3</span>
+              🏷️ {locale === "zh" ? "分类" : "CATEGORIES"}: <span>3</span>
             </StatItem>
             <StatItem $locale={locale} $color="#ff2d7b">
-              ⚡ {locale === 'zh' ? '状态' : 'STATUS'}: <span>{locale === 'zh' ? '在线' : 'ONLINE'}</span>
+              ⚡ {locale === "zh" ? "状态" : "STATUS"}:{" "}
+              <span>{locale === "zh" ? "在线" : "ONLINE"}</span>
             </StatItem>
           </StatsBar>
         </PageHeader>
 
         <Divider $locale={locale}>
-          ◆ {locale === 'zh' ? '文章列表' : 'ENTRIES'} ◆
+          ◆ {locale === "zh" ? "文章列表" : "ENTRIES"} ◆
         </Divider>
 
-        <BlogList posts={posts} readTimeText={readTimeText} emptyText={emptyText} locale={locale} />
+        <BlogList
+          posts={posts}
+          readTimeText={readTimeText}
+          emptyText={emptyText}
+          locale={locale}
+        />
       </Container>
     </PageWrapper>
   );
