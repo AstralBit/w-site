@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link } from '../../i18n/routing';
 import { BlogPost } from '@/types/blog';
@@ -10,6 +11,8 @@ import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { visit } from 'unist-util-visit';
+import type { Root, Heading } from 'mdast';
 
 // ========== 动画 ==========
 const float = keyframes`
@@ -42,28 +45,136 @@ const pulse = keyframes`
   50% { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
 `;
 
-const neonFlicker = keyframes`
-  0%, 100% { opacity: 1; }
-  92% { opacity: 1; }
-  93% { opacity: 0.8; }
-  94% { opacity: 1; }
-  96% { opacity: 0.9; }
-  97% { opacity: 1; }
-`;
 
 // ========== 样式组件 ==========
 const PageWrapper = styled.div`
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  /* 移除 overflow: hidden，否则会阻止 sticky 定位 */
 `;
 
 const Container = styled.main`
-  max-width: 900px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 120px 24px 80px;
   position: relative;
   z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 40px;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+`;
+
+const MainContent = styled.div`
+  /* 移除 max-width，让 grid 布局控制宽度 */
+`;
+
+const Sidebar = styled.aside<{ $top: number }>`
+  position: sticky;
+  top: ${props => props.$top}px;
+  align-self: start;
+  height: fit-content;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 3px solid var(--foreground);
+  width: 100%;
+  min-width: 0;
+  transition: top 0.3s ease;
+  
+  /* 像素角 */
+  clip-path: polygon(
+    0 8px, 8px 8px, 8px 0,
+    calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
+    100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
+    8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+  );
+
+  /* 滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--card-border);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #00ff41;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #00d4ff;
+  }
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
+const SidebarTitle = styled.div<{ $locale: Locale }>`
+  font-family: ${pixelFont};
+  font-size: ${props => getFontSize('sm', props.$locale)};
+  color: var(--foreground);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: '📑';
+  }
+`;
+
+const TocList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const TocItem = styled.li<{ $level: number; $isActive: boolean; $locale: Locale }>`
+  margin: ${props => props.$level === 1 ? '12px 0' : '8px 0'};
+  padding-left: ${props => (props.$level - 1) * 16}px;
+  
+  a {
+    display: block;
+    font-family: ${pixelFont};
+    font-size: ${props => {
+      if (props.$level === 1) return '0.8rem';
+      if (props.$level === 2) return '0.7rem';
+      return '0.7rem';
+    }};
+    color: ${props => props.$isActive ? '#00ff41' : 'var(--text-secondary)'};
+    text-decoration: none;
+    padding: 6px 10px;
+    border-left: 2px solid ${props => props.$isActive ? '#00ff41' : 'transparent'};
+    transition: all 0.15s ease;
+    position: relative;
+
+    &:hover {
+      color: #00d4ff;
+      background: rgba(0, 212, 255, 0.1);
+      border-left-color: #00d4ff;
+    }
+
+    &::before {
+      content: '▶';
+      display: ${props => props.$isActive ? 'inline' : 'none'};
+      margin-right: 6px;
+      color: #00ff41;
+      font-size: 8px;
+    }
+  }
 `;
 
 // 返回按钮
@@ -409,6 +520,7 @@ const ContentInner = styled.div<{ $locale: Locale }>`
     font-weight: bold;
     line-height: ${props => getLineHeight('normal', props.$locale)};
     position: relative;
+    scroll-margin-top: 100px;
 
     &::before {
       content: '#';
@@ -648,6 +760,50 @@ interface BlogDetailClientProps {
   locale: Locale;
 }
 
+// 标题类型
+interface TocItem {
+  id: string;
+  text: string;
+  level: number;
+}
+
+// 生成标题 ID
+const generateId = (text: string): string => {
+  return text
+    .toLowerCase()
+    .replace(/[^\u4e00-\u9fa5a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+};
+
+// 解析 Markdown 提取标题
+const extractHeadings = (content: string): TocItem[] => {
+  const headings: TocItem[] = [];
+  if (!content) {
+    console.log('extractHeadings: content is empty');
+    return headings;
+  }
+  
+  const lines = content.split('\n');
+
+  lines.forEach((line) => {
+    // 匹配 Markdown 标题格式：## 标题 或 # 标题
+    // 支持 # 后面有空格或没有空格的情况
+    const match = line.match(/^(#{1,6})\s+(.+)$/);
+    if (match) {
+      const level = match[1].length;
+      const text = match[2].trim();
+      // 移除标题中的 Markdown 链接格式 [text](url)
+      const cleanText = text.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+      const id = generateId(cleanText);
+      headings.push({ id, text: cleanText, level });
+    }
+  });
+  
+  return headings;
+};
+
+const TOP_OFFSET = 820;
+
 export default function BlogDetailClient({ 
   post, 
   readTimeText,
@@ -655,6 +811,109 @@ export default function BlogDetailClient({
   navItems,
   locale
 }: BlogDetailClientProps) {
+  const [activeId, setActiveId] = useState<string>('');
+  const [headings, setHeadings] = useState<TocItem[]>([]);
+  const [sidebarTop, setSidebarTop] = useState<number>(TOP_OFFSET);
+
+  // 从内容中提取标题
+  useEffect(() => {
+    const extracted = extractHeadings(post.content);
+    // 使用 setTimeout 避免同步 setState
+    if (extracted.length > 0) {
+      setTimeout(() => setHeadings(extracted), 0);
+    } else {
+      // 如果从内容中提取失败，等待 DOM 渲染后从 DOM 中提取
+      const timer = setTimeout(() => {
+        const domHeadings = document.querySelectorAll('article h1, article h2, article h3, article h4, article h5, article h6');
+        
+        if (domHeadings.length > 0) {
+          const extractedFromDom: TocItem[] = [];
+          domHeadings.forEach((heading) => {
+            const level = parseInt(heading.tagName.charAt(1));
+            const text = heading.textContent?.trim() || '';
+            // 移除 # 符号（如果存在）
+            const cleanText = text.replace(/^#+\s*/, '').trim();
+            const id = heading.id || generateId(cleanText);
+            
+            if (cleanText && !extractedFromDom.find(h => h.id === id)) {
+              extractedFromDom.push({ id, text: cleanText, level });
+            }
+          });
+          if (extractedFromDom.length > 0) {
+            setHeadings(extractedFromDom);
+          }
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [post.content]);
+
+  // 监听滚动，高亮当前标题并调整侧边栏位置
+  useEffect(() => {
+    if (headings.length === 0) return;
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      
+      // 当滚动超过 680px 时，将侧边栏 top 从 800px 改为 120px
+      // 680 = 800 - 120，这样在滚动到 680px 时，侧边栏刚好到达 120px 位置
+      if (scrollPosition >= 680) {
+        setSidebarTop(TOP_OFFSET - 700);
+      } else {
+        setSidebarTop(TOP_OFFSET);
+      }
+      
+      // 找到当前应该高亮的标题
+      const scrollPositionForHeading = scrollPosition + 150;
+      let current = '';
+      for (let i = headings.length - 1; i >= 0; i--) {
+        const element = document.getElementById(headings[i].id);
+        if (element && element.offsetTop <= scrollPositionForHeading) {
+          current = headings[i].id;
+          break;
+        }
+      }
+      
+      setActiveId(current || headings[0]?.id || '');
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // 初始调用
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [headings]);
+
+  // 为标题添加 ID 的 rehype 插件
+  const rehypeSlug = () => {
+    return (tree: Root) => {
+      visit(tree, 'heading', (node: Heading) => {
+        if (node.children && node.children.length > 0) {
+          const text = node.children
+            .filter((child) => child.type === 'text')
+            .map((child) => 'value' in child ? child.value : '')
+            .join('');
+          const id = generateId(text);
+          node.data = node.data || {};
+          (node.data as { id?: string; hProperties?: { id: string } }).id = id;
+          (node.data as { id?: string; hProperties?: { id: string } }).hProperties = { id };
+        }
+      });
+    };
+  };
+
+  // 点击跳转到标题
+  const handleTocClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      const offsetTop = element.offsetTop - 100;
+      window.scrollTo({
+        top: offsetTop,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <PageWrapper>
       {/* 星际大战背景 */}
@@ -663,9 +922,10 @@ export default function BlogDetailClient({
       <Header navItems={navItems} />
       
       <Container>
-        <BackButton href="/blog" $locale={locale}>
-          {backText}
-        </BackButton>
+        <MainContent>
+          <BackButton href="/blog" $locale={locale}>
+            {backText}
+          </BackButton>
 
         <CoverArea $category={post.category}>
           <CoverCorner $position="tl" $locale={locale}>┌ FILE: {post.slug}</CoverCorner>
@@ -701,34 +961,104 @@ export default function BlogDetailClient({
           </MetaCard>
         </ArticleHeader>
 
-        <Content $locale={locale}>
-          <ContentInner $locale={locale}>
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
-            >
-              {post.content}
-            </ReactMarkdown>
-          </ContentInner>
-        </Content>
+          <Content $locale={locale}>
+            <ContentInner $locale={locale}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw, rehypeSlug]}
+                components={{
+                  h1: ({ node, children, ...props }) => {
+                    const textContent = Array.isArray(children) 
+                      ? children.map(c => typeof c === 'string' ? c : '').join('')
+                      : String(children || '');
+                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
+                    return <h1 id={id} {...props}>{children}</h1>;
+                  },
+                  h2: ({ node, children, ...props }) => {
+                    const textContent = Array.isArray(children) 
+                      ? children.map(c => typeof c === 'string' ? c : '').join('')
+                      : String(children || '');
+                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
+                    return <h2 id={id} {...props}>{children}</h2>;
+                  },
+                  h3: ({ node, children, ...props }) => {
+                    const textContent = Array.isArray(children) 
+                      ? children.map(c => typeof c === 'string' ? c : '').join('')
+                      : String(children || '');
+                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
+                    return <h3 id={id} {...props}>{children}</h3>;
+                  },
+                  h4: ({ node, children, ...props }) => {
+                    const textContent = Array.isArray(children) 
+                      ? children.map(c => typeof c === 'string' ? c : '').join('')
+                      : String(children || '');
+                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
+                    return <h4 id={id} {...props}>{children}</h4>;
+                  },
+                  h5: ({ node, children, ...props }) => {
+                    const textContent = Array.isArray(children) 
+                      ? children.map(c => typeof c === 'string' ? c : '').join('')
+                      : String(children || '');
+                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
+                    return <h5 id={id} {...props}>{children}</h5>;
+                  },
+                  h6: ({ node, children, ...props }) => {
+                    const textContent = Array.isArray(children) 
+                      ? children.map(c => typeof c === 'string' ? c : '').join('')
+                      : String(children || '');
+                    const id = (node?.data as { id?: string })?.id || generateId(textContent);
+                    return <h6 id={id} {...props}>{children}</h6>;
+                  },
+                }}
+              >
+                {post.content}
+              </ReactMarkdown>
+            </ContentInner>
+          </Content>
 
-        <TagsSection>
-          <TagsTitle $locale={locale}>{locale === 'zh' ? '标签' : 'TAGS'}</TagsTitle>
-          <TagsGrid>
-            {post.tags.map(tag => (
-              <Tag key={tag} $locale={locale}>{tag}</Tag>
-            ))}
-          </TagsGrid>
-        </TagsSection>
+          <TagsSection>
+            <TagsTitle $locale={locale}>{locale === 'zh' ? '标签' : 'TAGS'}</TagsTitle>
+            <TagsGrid>
+              {post.tags.map(tag => (
+                <Tag key={tag} $locale={locale}>{tag}</Tag>
+              ))}
+            </TagsGrid>
+          </TagsSection>
 
-        <EndMark>
-          <EndText $locale={locale}>
-            ◆ {locale === 'zh' ? '文章结束' : 'END OF FILE'} <span>_</span> ◆
-          </EndText>
-          <EndDecor>
-            <div /><div /><div /><div /><div />
-          </EndDecor>
-        </EndMark>
+          <EndMark>
+            <EndText $locale={locale}>
+              ◆ {locale === 'zh' ? '文章结束' : 'END OF FILE'} <span>_</span> ◆
+            </EndText>
+            <EndDecor>
+              <div /><div /><div /><div /><div />
+            </EndDecor>
+          </EndMark>
+        </MainContent>
+
+        {headings.length > 0 ? (
+          <Sidebar $top={sidebarTop}>
+            <SidebarTitle $locale={locale}>
+              {locale === 'zh' ? '目录' : 'TABLE OF CONTENTS'}
+            </SidebarTitle>
+            <TocList>
+              {headings.map((heading) => (
+                <TocItem
+                  key={heading.id}
+                  $level={heading.level}
+                  $isActive={activeId === heading.id}
+                  $locale={locale}
+                >
+                  <a
+                    href={`#${heading.id}`}
+                    onClick={(e) => handleTocClick(e, heading.id)}
+                  >
+                    {heading.text}
+                  </a>
+                </TocItem>
+              ))}
+            </TocList>
+          </Sidebar>
+        ) : null}
       </Container>
     </PageWrapper>
   );

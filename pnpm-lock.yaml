@@ -50,6 +50,9 @@ importers:
       three:
         specifier: ^0.182.0
         version: 0.182.0
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@netlify/plugin-nextjs':
         specifier: ^5.15.5
