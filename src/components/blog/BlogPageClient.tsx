@@ -3,10 +3,15 @@
 import styled, { keyframes } from 'styled-components';
 import { BlogPost } from '@/types/blog';
 import BlogList from './BlogList';
-import Header from '../Header';
-import StarWarsBackground from '../StarWarsBackground';
+import dynamic from 'next/dynamic';
 import { Locale } from '@/i18n/routing';
+import Header from '../Header';
 import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
+
+const StarWarsBackground = dynamic(() => import("../StarWarsBackground"), {
+  ssr: false,
+});
+
 
 // ========== 动画 ==========
 const glitch = keyframes`

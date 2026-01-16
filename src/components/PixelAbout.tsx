@@ -1,9 +1,13 @@
 "use client";
 
 import styled, { keyframes } from "styled-components";
-import Header from "./Header";
-import StarWarsBackground from "./StarWarsBackground";
+import dynamic from "next/dynamic";
 import { PageWrapper, PixelDecoration } from "./commonStyled";
+import Header from "./Header";
+
+const StarWarsBackground = dynamic(() => import("./StarWarsBackground"), {
+  ssr: false,
+});
 
 // 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;

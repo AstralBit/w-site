@@ -1,9 +1,16 @@
 "use client";
 
 import styled, { keyframes } from "styled-components";
+import dynamic from "next/dynamic";
 import Header from "./Header";
-import Antigravity from "./Antigravity";
-import StarWarsBackground from "./StarWarsBackground";
+
+const StarWarsBackground = dynamic(() => import("./StarWarsBackground"), {
+  ssr: false,
+});
+
+const Antigravity = dynamic(() => import("./Antigravity"), {
+  ssr: false,
+});
 
 // 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
@@ -53,6 +60,8 @@ const PageWrapper = styled.div`
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  /* 添加初始背景色，避免异步加载时的白屏闪烁 */
+  background: radial-gradient(ellipse at center, #0a0a1a 0%, #000005 100%);
 `;
 
 const Container = styled.main`
@@ -113,14 +122,22 @@ const FeatureCard = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 12px, 12px 12px, 12px 0,
-    calc(100% - 12px) 0, calc(100% - 12px) 12px, 100% 12px,
-    100% calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) 100%,
-    12px 100%, 12px calc(100% - 12px), 0 calc(100% - 12px)
+    0 12px,
+    12px 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    calc(100% - 12px) 12px,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    12px calc(100% - 12px),
+    0 calc(100% - 12px)
   );
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 12px;
@@ -185,25 +202,41 @@ const PixelDivider = styled.div`
     height: 8px;
     background: #333;
 
-    &:nth-child(1) { background: #ff2d7b; }
-    &:nth-child(2) { background: #ffff00; }
-    &:nth-child(3) { background: #00ff41; }
-    &:nth-child(4) { background: #00d4ff; }
-    &:nth-child(5) { background: #a78bfa; }
+    &:nth-child(1) {
+      background: #ff2d7b;
+    }
+    &:nth-child(2) {
+      background: #ffff00;
+    }
+    &:nth-child(3) {
+      background: #00ff41;
+    }
+    &:nth-child(4) {
+      background: #00d4ff;
+    }
+    &:nth-child(5) {
+      background: #a78bfa;
+    }
   }
 `;
 
 // 像素艺术装饰
-const PixelDecoration = styled.div<{ $top?: string; $left?: string; $right?: string; $bottom?: string; $delay: number }>`
+const PixelDecoration = styled.div<{
+  $top?: string;
+  $left?: string;
+  $right?: string;
+  $bottom?: string;
+  $delay: number;
+}>`
   position: fixed;
-  top: ${props => props.$top || 'auto'};
-  left: ${props => props.$left || 'auto'};
-  right: ${props => props.$right || 'auto'};
-  bottom: ${props => props.$bottom || 'auto'};
+  top: ${(props) => props.$top || "auto"};
+  left: ${(props) => props.$left || "auto"};
+  right: ${(props) => props.$right || "auto"};
+  bottom: ${(props) => props.$bottom || "auto"};
   font-size: 2rem;
   opacity: 0.4;
   animation: ${float} 4s ease-in-out infinite;
-  animation-delay: ${props => props.$delay}s;
+  animation-delay: ${(props) => props.$delay}s;
   filter: drop-shadow(0 0 10px currentColor);
   pointer-events: none;
   z-index: 2;
@@ -230,10 +263,18 @@ const NeonBanner = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 
   @media (max-width: 768px) {
@@ -278,10 +319,18 @@ export default function PixelHome({ navItems, translations }: PixelHomeProps) {
       <StarWarsBackground />
 
       {/* 浮动装饰 */}
-      <PixelDecoration $top="20%" $left="5%" $delay={0}>🚀</PixelDecoration>
-      <PixelDecoration $top="40%" $right="8%" $delay={1}>🛸</PixelDecoration>
-      <PixelDecoration $bottom="30%" $left="8%" $delay={2}>⭐</PixelDecoration>
-      <PixelDecoration $bottom="20%" $right="5%" $delay={1.5}>🌟</PixelDecoration>
+      <PixelDecoration $top="20%" $left="5%" $delay={0}>
+        🚀
+      </PixelDecoration>
+      <PixelDecoration $top="40%" $right="8%" $delay={1}>
+        🛸
+      </PixelDecoration>
+      <PixelDecoration $bottom="30%" $left="8%" $delay={2}>
+        ⭐
+      </PixelDecoration>
+      <PixelDecoration $bottom="20%" $right="5%" $delay={1.5}>
+        🌟
+      </PixelDecoration>
 
       <Header navItems={navItems} />
 

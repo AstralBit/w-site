@@ -1,8 +1,17 @@
-import StarWarsBackground from "./StarWarsBackground";
+'use client';
+
+import dynamic from "next/dynamic";
 import { PageWrapper, PixelDecoration } from "./commonStyled";
 import Header from "./Header";
-import DomeGallery from "./DomeGallery";
 
+const StarWarsBackground = dynamic(() => import("./StarWarsBackground"), {
+  ssr: false,
+});
+
+const DomeGallery = dynamic(() => import("./DomeGallery"), {
+  ssr: false,
+});
+  
 interface PhotosClientProps {
   navItems: { label: string; href: string }[];
 }
