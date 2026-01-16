@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "Pixel Dev | 像素开发者",
+    "title": "Developer",
     "description": "一个热爱代码的全栈工程师，专注于创造有趣的数字体验。探索像素艺术风格的个人网站。",
     "getStarted": "开始使用，编辑 page.tsx 文件。",
     "lookingFor": "寻找起点或更多说明？前往",
@@ -15,6 +15,7 @@
     "home": "首页",
     "blog": "博客",
     "about": "关于",
+    "photos": "照片",
     "contact": "联系我们"
   },
   "blog": {
@@ -25,7 +26,8 @@
     "backToList": "返回博客列表"
   },
   "home": {
-    "title": "像素开发者",
+    "title": "开发者",
+    "description": "一个热爱代码的全栈工程师，专注于创造有趣的数字体验。探索像素艺术风格的个人网站。",
     "subtitle": "热爱代码的全栈工程师，专注于创造有趣的数字体验",
     "stats": {
       "projects": "项目完成",
@@ -44,16 +46,6 @@
           "icon": "🔧",
           "title": "后端服务",
           "desc": "Node.js / Python / Go 打造高性能服务"
-        },
-        {
-          "icon": "🎨",
-          "title": "UI/UX 设计",
-          "desc": "用像素级的精确度设计美观的界面"
-        },
-        {
-          "icon": "🚀",
-          "title": "DevOps",
-          "desc": "Docker / K8s / CI/CD 自动化部署"
         }
       ]
     },
@@ -66,6 +58,7 @@
   },
   "about": {
     "title": "关于我",
+    "description": "一个热爱代码的全栈工程师，专注于创造有趣的数字体验。探索像素艺术风格的个人网站。",
     "subtitle": "一个全栈开发者",
     "bio": {
       "title": "个人简介",

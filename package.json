@@ -12,10 +12,16 @@
   "dependencies": {
     "@react-three/fiber": "^9.5.0",
     "@types/styled-components": "^5.1.36",
+    "@use-gesture/react": "^10.3.1",
+    "gray-matter": "^4.0.3",
     "next": "16.1.2",
     "next-intl": "^4.7.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "styled-components": "^6.3.6",
     "three": "^0.182.0"
   },

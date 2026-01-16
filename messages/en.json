@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "Pixel Dev | Full-Stack Developer",
+    "title": "Developer",
     "description": "A passionate full-stack engineer focused on creating fun digital experiences. Explore a pixel art styled personal website.",
     "getStarted": "To get started, edit the page.tsx file.",
     "lookingFor": "Looking for a starting point or more instructions? Head over to",
@@ -15,6 +15,7 @@
     "home": "Home",
     "blog": "Blog",
     "about": "About",
+    "photos": "Photos",
     "contact": "Contact"
   },
   "blog": {
@@ -25,7 +26,8 @@
     "backToList": "Back to blog"
   },
   "home": {
-    "title": "PIXEL DEV",
+    "title": "Developer",
+    "description": "A passionate full-stack engineer focused on creating fun digital experiences. Explore a pixel art styled personal website.",
     "subtitle": "Full-stack engineer who loves code, focused on creating fun digital experiences",
     "stats": {
       "projects": "Projects Done",
@@ -56,6 +58,7 @@
   },
   "about": {
     "title": "ABOUT ME",
+    "description": "A passionate full-stack engineer focused on creating fun digital experiences. Explore a pixel art styled personal website.",
     "subtitle": "A full-stack developer",
     "bio": {
       "title": "BIO",

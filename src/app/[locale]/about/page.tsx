@@ -1,6 +1,18 @@
 import { getTranslations, getLocale } from "next-intl/server";
+import type { Metadata } from "next";
 import PixelAbout from "@/components/PixelAbout";
 import { getNavItems } from "@/config/navigation";
+
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("about");
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function AboutPage() {
   const locale = await getLocale();
@@ -38,7 +50,6 @@ export default async function AboutPage() {
         { name: "React/Next.js", level: 95 },
         { name: "TypeScript", level: 90 },
         { name: "Node.js", level: 85 },
-        { name: "Python", level: 80 },
         { name: "UI/UX Design", level: 75 },
       ],
     },

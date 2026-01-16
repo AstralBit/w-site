@@ -3,15 +3,10 @@
 import styled, { keyframes } from "styled-components";
 import Header from "./Header";
 import StarWarsBackground from "./StarWarsBackground";
+import { PageWrapper, PixelDecoration } from "./commonStyled";
 
 // 像素字体
 const pixelFont = `'Press Start 2P', 'Courier New', monospace`;
-
-// 动画
-const float = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-`;
 
 const blink = keyframes`
   0%, 100% { opacity: 1; }
@@ -62,39 +57,12 @@ const hologram = keyframes`
   }
 `;
 
-// 样式组件
-const PageWrapper = styled.div`
-  min-height: 100vh;
-  position: relative;
-  overflow: hidden;
-`;
-
 const Container = styled.main`
   max-width: 900px;
   margin: 0 auto;
   padding: 120px 24px 64px;
   position: relative;
   z-index: 1;
-`;
-
-// 像素装饰
-const PixelDecoration = styled.div<{ $top?: string; $left?: string; $right?: string; $bottom?: string; $delay: number }>`
-  position: fixed;
-  top: ${props => props.$top || 'auto'};
-  left: ${props => props.$left || 'auto'};
-  right: ${props => props.$right || 'auto'};
-  bottom: ${props => props.$bottom || 'auto'};
-  font-size: 2rem;
-  opacity: 0.4;
-  animation: ${float} 4s ease-in-out infinite;
-  animation-delay: ${props => props.$delay}s;
-  filter: drop-shadow(0 0 10px currentColor);
-  pointer-events: none;
-  z-index: 2;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
 `;
 
 // Hero 区域
@@ -108,10 +76,7 @@ const Title = styled.h1`
   font-size: 2rem;
   color: #fff;
   margin-bottom: 16px;
-  text-shadow: 
-    0 0 10px #00ff41,
-    0 0 20px #00ff41,
-    0 0 40px #00ff41,
+  text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 40px #00ff41,
     4px 4px 0 #ff2d7b;
   animation: ${glitch} 5s ease-in-out infinite;
 
@@ -120,9 +85,9 @@ const Title = styled.h1`
   }
 `;
 
-const Subtitle = styled.p`
+const Subtitle = styled.p<{ $locale: string }>`
   font-family: ${pixelFont};
-  font-size: 0.75rem;
+  font-size: ${(props) => (props.$locale === "en" ? "0.75rem" : "1rem")};
   color: #00d4ff;
   line-height: 2;
   text-shadow: 0 0 10px #00d4ff;
@@ -146,14 +111,22 @@ const Card = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 12px, 12px 12px, 12px 0,
-    calc(100% - 12px) 0, calc(100% - 12px) 12px, 100% 12px,
-    100% calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) 100%,
-    12px 100%, 12px calc(100% - 12px), 0 calc(100% - 12px)
+    0 12px,
+    12px 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    calc(100% - 12px) 12px,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    12px calc(100% - 12px),
+    0 calc(100% - 12px)
   );
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 12px;
@@ -194,7 +167,7 @@ const SectionTitle = styled.h2`
 // Bio 区域
 const BioContent = styled.p<{ $locale: string }>`
   font-family: ${pixelFont};
-  font-size: ${props => props.$locale === 'en' ? '0.625rem' : '1rem'};
+  font-size: ${(props) => (props.$locale === "en" ? "0.625rem" : "1rem")};
   color: #aaa;
   line-height: 2.5;
 `;
@@ -217,10 +190,18 @@ const TimelineItem = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 6px, 6px 6px, 6px 0,
-    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
-    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
-    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+    0 6px,
+    6px 6px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 6px),
+    0 calc(100% - 6px)
   );
 
   &:hover {
@@ -244,9 +225,9 @@ const TimelineIcon = styled.span`
   filter: drop-shadow(0 0 10px currentColor);
 `;
 
-const TimelineEvent = styled.span`
+const TimelineEvent = styled.span<{ $locale: string }>`
   font-family: ${pixelFont};
-  font-size: 0.625rem;
+  font-size: ${(props) => (props.$locale === "en" ? "0.625rem" : "1rem")};
   color: #aaa;
 `;
 
@@ -291,17 +272,25 @@ const SkillBarBg = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 `;
 
 const SkillBarFill = styled.div<{ $level: number }>`
   height: 100%;
   background: linear-gradient(90deg, #00ff41, #00d4ff, #a78bfa);
-  --skill-level: ${props => props.$level}%;
+  --skill-level: ${(props) => props.$level}%;
   animation: ${fillBar} 1.5s ease-out forwards;
   position: relative;
   box-shadow: 0 0 10px #00ff41;
@@ -341,10 +330,18 @@ const InterestItem = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 6px, 6px 6px, 6px 0,
-    calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
-    100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
-    6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
+    0 6px,
+    6px 6px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 6px),
+    0 calc(100% - 6px)
   );
 
   &:hover {
@@ -359,9 +356,9 @@ const InterestIcon = styled.span`
   filter: drop-shadow(0 0 10px currentColor);
 `;
 
-const InterestName = styled.span`
+const InterestName = styled.span<{ $locale: string }>`
   font-family: ${pixelFont};
-  font-size: 0.5rem;
+  font-size: ${(props) => (props.$locale === "en" ? "0.5rem" : "1rem")};
   color: #aaa;
 `;
 
@@ -380,16 +377,24 @@ const ContactItem = styled.div`
   border: 2px solid rgba(0, 212, 255, 0.3);
   background: rgba(0, 212, 255, 0.05);
   font-family: ${pixelFont};
-  font-size: 0.625rem;
+  font-size: 0.7rem;
   color: #aaa;
   transition: all 0.3s ease;
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 
   &::before {
@@ -433,11 +438,26 @@ const PixelDivider = styled.div`
     width: 8px;
     height: 8px;
 
-    &:nth-child(1) { background: #ff2d7b; box-shadow: 0 0 10px #ff2d7b; }
-    &:nth-child(2) { background: #ffff00; box-shadow: 0 0 10px #ffff00; }
-    &:nth-child(3) { background: #00ff41; box-shadow: 0 0 10px #00ff41; }
-    &:nth-child(4) { background: #00d4ff; box-shadow: 0 0 10px #00d4ff; }
-    &:nth-child(5) { background: #a78bfa; box-shadow: 0 0 10px #a78bfa; }
+    &:nth-child(1) {
+      background: #ff2d7b;
+      box-shadow: 0 0 10px #ff2d7b;
+    }
+    &:nth-child(2) {
+      background: #ffff00;
+      box-shadow: 0 0 10px #ffff00;
+    }
+    &:nth-child(3) {
+      background: #00ff41;
+      box-shadow: 0 0 10px #00ff41;
+    }
+    &:nth-child(4) {
+      background: #00d4ff;
+      box-shadow: 0 0 10px #00d4ff;
+    }
+    &:nth-child(5) {
+      background: #a78bfa;
+      box-shadow: 0 0 10px #a78bfa;
+    }
   }
 `;
 
@@ -469,10 +489,18 @@ const NeonBanner = styled.div`
 
   /* 像素角 */
   clip-path: polygon(
-    0 4px, 4px 4px, 4px 0,
-    calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
-    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
-    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
   );
 
   @media (max-width: 768px) {
@@ -536,7 +564,11 @@ interface PixelAboutProps {
   };
 }
 
-export default function PixelAbout({ navItems, locale, translations }: PixelAboutProps) {
+export default function PixelAbout({
+  navItems,
+  locale,
+  translations,
+}: PixelAboutProps) {
   const t = translations;
 
   return (
@@ -545,17 +577,25 @@ export default function PixelAbout({ navItems, locale, translations }: PixelAbou
       <StarWarsBackground />
 
       {/* 浮动装饰 */}
-      <PixelDecoration $top="15%" $left="5%" $delay={0}>🛸</PixelDecoration>
-      <PixelDecoration $top="25%" $right="8%" $delay={1}>🌟</PixelDecoration>
-      <PixelDecoration $bottom="20%" $left="8%" $delay={2}>🚀</PixelDecoration>
-      <PixelDecoration $bottom="30%" $right="5%" $delay={1.5}>⭐</PixelDecoration>
+      <PixelDecoration $top="15%" $left="5%" $delay={0}>
+        🛸
+      </PixelDecoration>
+      <PixelDecoration $top="25%" $right="8%" $delay={1}>
+        🌟
+      </PixelDecoration>
+      <PixelDecoration $bottom="20%" $left="8%" $delay={2}>
+        🚀
+      </PixelDecoration>
+      <PixelDecoration $bottom="30%" $right="5%" $delay={1.5}>
+        ⭐
+      </PixelDecoration>
 
       <Header navItems={navItems} />
 
       <Container>
         <HeroSection>
           <Title>{t.title}</Title>
-          <Subtitle>{t.subtitle}</Subtitle>
+          <Subtitle $locale={locale}>{t.subtitle}</Subtitle>
         </HeroSection>
 
         {/* Bio */}
@@ -573,7 +613,7 @@ export default function PixelAbout({ navItems, locale, translations }: PixelAbou
                 <TimelineItem key={index}>
                   <TimelineYear>{item.year}</TimelineYear>
                   <TimelineIcon>{item.icon}</TimelineIcon>
-                  <TimelineEvent>{item.event}</TimelineEvent>
+                  <TimelineEvent $locale={locale}>{item.event}</TimelineEvent>
                 </TimelineItem>
               ))}
             </Timeline>
@@ -605,7 +645,7 @@ export default function PixelAbout({ navItems, locale, translations }: PixelAbou
             {t.interests.items.map((interest, index) => (
               <InterestItem key={index}>
                 <InterestIcon>{interest.icon}</InterestIcon>
-                <InterestName>{interest.name}</InterestName>
+                <InterestName $locale={locale}>{interest.name}</InterestName>
               </InterestItem>
             ))}
           </InterestsGrid>

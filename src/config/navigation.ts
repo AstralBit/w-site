@@ -9,6 +9,7 @@ export const mainNavItems: NavItem[] = [
   { labelKey: 'home', href: '/' },
   { labelKey: 'blog', href: '/blog' },
   { labelKey: 'about', href: '/about' },
+  { labelKey: 'photos', href: '/photos' },
 ];
 
 // 辅助函数：根据翻译函数生成导航项

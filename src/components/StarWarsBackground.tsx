@@ -3,18 +3,6 @@
 import { useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 
-// ========== 动画 ==========
-const hyperspace = keyframes`
-  0% {
-    transform: translateZ(0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateZ(200px) scale(2);
-    opacity: 0;
-  }
-`;
-
 const twinkle = keyframes`
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
@@ -592,4 +580,5 @@ export default function StarWarsBackground() {
     </BackgroundWrapper>
   );
 }
+
 

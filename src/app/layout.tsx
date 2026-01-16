@@ -16,13 +16,13 @@ const siteConfig = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: 'Pixel Dev | 像素开发者',
-    template: '%s | Pixel Dev',
+    default: '全栈开发者',
+    template: '%s | AstralBit',
   },
   description: '一个热爱代码的全栈工程师，专注于创造有趣的数字体验。探索像素艺术风格的个人网站。',
   keywords: [
-    'Pixel Dev',
-    '像素开发者',
+    'AstralBit',
+    '全栈开发者',
     '全栈开发',
     'Full-Stack Developer',
     'React',
@@ -56,21 +56,21 @@ export const metadata: Metadata = {
     alternateLocale: 'en_US',
     url: siteConfig.url,
     siteName: siteConfig.name,
-    title: 'Pixel Dev | 像素开发者',
+    title: 'DEV | Full-Stack Developer',
     description: '一个热爱代码的全栈工程师，专注于创造有趣的数字体验。',
     images: [
       {
         url: '/og-image.svg',
         width: 1200,
         height: 630,
-        alt: 'Pixel Dev - 像素开发者',
+        alt: 'AstralBit - 全栈开发者',
         type: 'image/svg+xml',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pixel Dev | 像素开发者',
+    title: 'DEV | Full-Stack Developer',
     description: '一个热爱代码的全栈工程师，专注于创造有趣的数字体验。',
     images: ['/og-image.svg'],
     creator: '@AstralBit',

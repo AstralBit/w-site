@@ -7,6 +7,9 @@ import Header from '../Header';
 import StarWarsBackground from '../StarWarsBackground';
 import { Locale } from '@/i18n/routing';
 import { pixelFont, getFontSize, getLineHeight } from '@/config/fonts';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 // ========== 动画 ==========
 const float = keyframes`
@@ -394,8 +397,8 @@ const Content = styled.article<{ $locale: Locale }>`
 
 const ContentInner = styled.div<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('base', props.$locale)};
-  line-height: ${props => getLineHeight('loose', props.$locale)};
+  font-size: 1rem;
+  line-height: 150%;
   color: var(--text-secondary);
   position: relative;
   padding-left: 20px;
@@ -414,9 +417,9 @@ const ContentInner = styled.div<{ $locale: Locale }>`
     }
   }
 
-  h1 { font-size: ${props => getFontSize('lg', props.$locale)}; }
-  h2 { font-size: ${props => getFontSize('md', props.$locale)}; }
-  h3 { font-size: ${props => getFontSize('base', props.$locale)}; }
+  h1 { font-size: 2rem }
+  h2 { font-size: 1.5rem }
+  h3 { font-size: 1.25rem }
 
   p {
     margin: 1.5em 0;
@@ -441,7 +444,7 @@ const ContentInner = styled.div<{ $locale: Locale }>`
     color: var(--background);
     padding: 3px 8px;
     font-family: ${pixelFont};
-    font-size: ${props => getFontSize('sm', props.$locale)};
+    font-size: 0.8rem;
 
     /* 像素角 */
     clip-path: polygon(
@@ -542,7 +545,7 @@ const TagsGrid = styled.div`
 
 const Tag = styled.span<{ $locale: Locale }>`
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${props => getFontSize('md', props.$locale)};
   padding: 8px 14px;
   background: var(--card-bg);
   color: #00d4ff;
@@ -700,12 +703,12 @@ export default function BlogDetailClient({
 
         <Content $locale={locale}>
           <ContentInner $locale={locale}>
-            {post.content.split('\n').map((line, index) => (
-              <span key={index}>
-                {line}
-                <br />
-              </span>
-            ))}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+            >
+              {post.content}
+            </ReactMarkdown>
           </ContentInner>
         </Content>
 

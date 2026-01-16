@@ -259,7 +259,7 @@ const StatItem = styled.div<{ $locale: Locale; $color: string }>`
   background: rgba(10, 10, 10, 0.8);
   border: 2px solid ${props => props.$color};
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('xs', props.$locale)};
+  font-size: ${props => getFontSize('md', props.$locale)};
   color: ${props => props.$color};
   backdrop-filter: blur(5px);
   box-shadow: 
@@ -298,7 +298,7 @@ const Divider = styled.div<{ $locale: Locale }>`
   margin: 60px 0;
   color: #00ff41;
   font-family: ${pixelFont};
-  font-size: ${props => getFontSize('sm', props.$locale)};
+  font-size: ${props => getFontSize('md', props.$locale)};
   text-shadow: 0 0 10px #00ff41;
 
   &::before,
