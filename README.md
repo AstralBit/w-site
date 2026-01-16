@@ -3,6 +3,7 @@
 一个像素风格的个人网站，使用 Next.js 16 + styled-components 构建，支持中英文双语。
 <img width="1980" height="1242" alt="局部截取_20260115_171239" src="https://github.com/user-attachments/assets/78787595-e2c9-439a-941f-ae819497bdaf" />
 
+<img width="2348" height="1278" alt="局部截取_20260116_182602" src="https://github.com/user-attachments/assets/e2c84d4e-83e3-4511-9544-8b8beaa19e3f" />
 
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
