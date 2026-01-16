@@ -8,9 +8,6 @@
 
 <img width="1679" height="1278" alt="局部截取_20260116_182707" src="https://github.com/user-attachments/assets/30d85b74-eb45-4e62-86b8-de3c1bf6d20b" />
 
-<img width="2150" height="1241" alt="局部截取_20260116_182729" src="https://github.com/user-attachments/assets/bdcc232d-27f7-460a-ad4c-f185062a527f" />
-
-
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
